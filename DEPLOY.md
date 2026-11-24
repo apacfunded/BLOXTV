@@ -42,7 +42,8 @@ Before launch, with nothing rendering:
 
 1. **Test the stream picture and sound** (records 20 s of the stream overlay to a file, no stream key needed):
    ```bash
-   docker compose run --rm -e SELFTEST_SECONDS=20 streamer
+   mkdir -p data/episodes/stream-test && chmod 777 data/episodes/stream-test
+   docker compose build streamer && docker compose run --rm -e SELFTEST_SECONDS=20 streamer
    ```
    Then open `https://bloxtv.lol/episodes/stream-test.mp4`. You should see the overlay with the vote card and hear sound if an episode is playing.
 2. **Wipe the test episodes** so the story starts at chapter 1:

@@ -19,9 +19,18 @@ until curl -sf "$SITE_URL/api/state" >/dev/null; do log "waiting for $SITE_URL";
 
 Xvfb :99 -screen 0 "${W}x${H}x24" -nolisten tcp >/tmp/xvfb.log 2>&1 &
 sleep 1
-pulseaudio --start --exit-idle-time=-1 --disallow-exit >/tmp/pulse.log 2>&1 || true
+# Sound: a PulseAudio null sink the browser plays into; ffmpeg records its monitor.
+pulseaudio -D --exit-idle-time=-1 --disallow-exit --disable-shm=true --log-target=file:/tmp/pulse.log >/dev/null 2>&1 || true
+for i in $(seq 1 20); do pactl info >/dev/null 2>&1 && break; sleep 0.5; done
 pactl load-module module-null-sink sink_name=stream sink_properties=device.description=stream >/dev/null 2>&1 || true
 pactl set-default-sink stream >/dev/null 2>&1 || true
+if pactl list short sinks 2>/dev/null | grep -q "stream"; then
+  AUDIO_IN=(-f pulse -thread_queue_size 2048 -i stream.monitor)
+  log "audio: PulseAudio sink ready"
+else
+  AUDIO_IN=(-f lavfi -i anullsrc=r=44100:cl=stereo)
+  log "WARNING: PulseAudio failed, streaming SILENT audio. $(tail -n 3 /tmp/pulse.log 2>/dev/null | tr '\n' ' ')"
+fi
 
 browser() {
   chromium --no-sandbox --disable-gpu --disable-dev-shm-usage --kiosk --no-first-run --disable-infobars \
@@ -31,15 +40,15 @@ browser() {
 }
 encoder() {
   ffmpeg -hide_banner -loglevel warning \
-    -f x11grab -framerate "$FPS" -video_size "${W}x${H}" -draw_mouse 0 -i :99 \
-    -f pulse -i stream.monitor \
+    -probesize 20M -f x11grab -framerate "$FPS" -video_size "${W}x${H}" -draw_mouse 0 -thread_queue_size 1024 -i :99 \
+    "${AUDIO_IN[@]}" \
     -c:v libx264 -preset veryfast -tune zerolatency -pix_fmt yuv420p -g "$((FPS * 2))" -keyint_min "$FPS" \
     -b:v "${VIDEO_BITRATE:-4500k}" -maxrate "${VIDEO_BITRATE:-4500k}" -bufsize "$((2 * ${VIDEO_BITRATE%k}))k" \
     -c:a aac -b:a "${AUDIO_BITRATE:-160k}" -ar 44100 -ac 2 \
     "$@"
 }
 if [ -n "$SELFTEST" ]; then
-  mkdir -p /out/stream-test
+  mkdir -p /out/stream-test 2>/dev/null || { log "cannot write to /out. On the server run: mkdir -p data/episodes/stream-test && chmod 777 data/episodes/stream-test"; exit 1; }
   log "self-test: recording ${SELFTEST}s of the stream to /out/stream-test/episode.mp4"
   browser & BPID=$!
   sleep 8
