@@ -1,0 +1,56 @@
+{
+  "title": "Candlewick — chapter 3: The Audition",
+  "premise": "Ollie follows Milo up the Hill in secret",
+  "cliffhanger": "Then the Whale stepped out of the elevator. He said four words. Find who never loses.",
+  "nextOptions": [
+    "Ollie sneaks back down before anyone sees him",
+    "A Bot finds Ollie behind the planter",
+    "Milo spots Ollie and says nothing"
+  ],
+  "scenes": [
+    {
+      "line": "In my town, nobody from the Flats goes up the Hill. Milo went anyway. I followed him.",
+      "setting": "the gold staircase from the Flats to the Hill",
+      "action": "Milo climbs, Ollie hides behind mail parcels",
+      "mood": "day"
+    },
+    {
+      "line": "Up there, the water is clean. The charts are always green. Even the fountains are gold.",
+      "setting": "the gold fountain plaza on the Hill",
+      "action": "Ollie peeks from behind the fountain",
+      "mood": "day"
+    },
+    {
+      "line": "The Callers took Milo to their rooftop. They gave him a ring light and a coin to call.",
+      "setting": "the Callers rooftop studio",
+      "action": "the Callers put a ring light on Milo and hand him a coin",
+      "mood": "day"
+    },
+    {
+      "line": "Before Milo said a word, three wallets bought the coin. Theirs.",
+      "setting": "behind a plant on the rooftop",
+      "action": "Ollie sees three Caller wallets buy first, his eye glows green",
+      "mood": "sunset"
+    },
+    {
+      "line": "Milo called it. The whole Flats bought it. From up here, you can watch them.",
+      "setting": "the rooftop edge at sunset",
+      "action": "Milo calls the coin, the Flats light up below",
+      "mood": "sunset"
+    },
+    {
+      "line": "Then the Callers sold. All at once. Milo was still smiling on the big screen.",
+      "setting": "the rooftop at dusk",
+      "action": "the Callers sell at once, the chart crashes red, Milo still smiling on screen",
+      "mood": "sunset"
+    },
+    {
+      "line": "Then the Whale stepped out of the elevator. He said four words. Find who never loses.",
+      "setting": "the rooftop at night",
+      "action": "the Whale steps out of a gold elevator, Ollie frozen behind the plant",
+      "mood": "night"
+    }
+  ],
+  "videoFile": "episodes/part3.mp4",
+  "clips": []
+}

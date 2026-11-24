@@ -1,0 +1,56 @@
+{
+  "title": "Candlewick — chapter 4: anon_777",
+  "premise": "Milo spots Ollie and says nothing",
+  "cliffhanger": "Tonight the Whale put a bounty on the big screen. One thousand SOL for anon_777's real name.",
+  "nextOptions": [
+    "Milo starts hunting for anon_777",
+    "Ollie plants a fake trail pointing at the Hill",
+    "Mrs. Pearl offers to take the blame"
+  ],
+  "scenes": [
+    {
+      "line": "Milo saw me behind the plants. He looked right at me. He didn't say a word.",
+      "setting": "the rooftop at night",
+      "action": "Milo looks straight at Ollie and says nothing",
+      "mood": "night"
+    },
+    {
+      "line": "I rode back down in the ducks' mail sack. Nobody checks the mail.",
+      "setting": "the canal down from the Hill at night",
+      "action": "two ducks row Ollie home in a mail sack",
+      "mood": "night"
+    },
+    {
+      "line": "In my town, the Board shows the ten richest wallets. Nobody from the Flats has ever been on it.",
+      "setting": "the Launch Pad square",
+      "action": "the Board with ten gold names",
+      "mood": "day"
+    },
+    {
+      "line": "This morning there was a new name at number eight. anon_777.",
+      "setting": "the Launch Pad square",
+      "action": "anon_777 appears at number 8, everyone points, Ollie looks at his boots",
+      "mood": "day"
+    },
+    {
+      "line": "The Flats went crazy. Someone from down here finally beat the Hill.",
+      "setting": "the docks",
+      "action": "the Flats celebrate, Ollie stands still",
+      "mood": "day"
+    },
+    {
+      "line": "I lost two trades in public. Loudly. Just in case.",
+      "setting": "the square at sunset",
+      "action": "Ollie fakes a loss, a Bot watches",
+      "mood": "sunset"
+    },
+    {
+      "line": "Tonight the Whale put a bounty on the big screen. One thousand SOL for anon_777's real name.",
+      "setting": "the Flats at night",
+      "action": "the Whale posts a 1000 SOL bounty on the big screen",
+      "mood": "night"
+    }
+  ],
+  "videoFile": "episodes/part4.mp4",
+  "clips": []
+}
