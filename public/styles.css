@@ -93,6 +93,13 @@ main { outline: none; padding-bottom: 48px; }
 .tv-caption .mini { height: 6px; border-radius: 999px; background: var(--surface-2); margin: 10px auto 0; overflow: hidden; max-width: 360px; }
 .tv-caption .mini span { display: block; height: 100%; background: var(--accent); transition: width .6s; }
 
+.channels { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+.chan { min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface); color: var(--muted); font: 700 13px "Chakra Petch", sans-serif; text-transform: uppercase; letter-spacing: .06em; cursor: pointer; }
+.chan.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.seasons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
+.season { display: grid; min-width: 120px; padding: 10px 16px; border-radius: 14px; border: 1px solid var(--line-2); background: var(--surface); color: var(--muted); font: 700 15px "Chakra Petch", sans-serif; text-transform: uppercase; letter-spacing: .04em; cursor: pointer; text-align: left; }
+.season small { font: 500 12px Rubik, sans-serif; text-transform: none; letter-spacing: 0; }
+.season.on { border-color: var(--accent); color: var(--text); background: var(--surface-2); }
 .home-vote { max-width: 620px; margin: 40px auto 0; text-align: left; }
 .home-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 40px auto 0; text-align: left; }
 .tile { display: block; text-decoration: none; padding: 20px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); transition: border-color .15s, transform .15s; }

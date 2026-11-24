@@ -14,5 +14,7 @@
   "countExistingFees": false,
   "feeVaults": [],
   "pollSeconds": 20,
+  "seasonLength": 10,
+  "trailer": "/brand/trailer.mp4",
   "links": { "x": "", "telegram": "" }
 }

@@ -127,22 +127,44 @@
     if (feed) feed.innerHTML = (poll.recent || []).slice(0, 5).map((v) => `<li><span class="plus">${esc(v.key)}</span><span>${esc(v.name)}</span><span class="muted">${v.source === "chat" ? "pump.fun chat" : "website"}</span><span class="when muted">${ago(v.at)}</span></li>`).join("");
   }
 
-  // The TV: plays the latest episode; static between episodes.
+  // The TV: a channel loop. The trailer plays first, then the latest episode, then round again.
+  // Buttons under the TV jump straight to either.
+  let tvMode = null; // "trailer" | "episode"
   function mountTV(container) {
     const latest = ready()[0];
     const { stage } = current();
-    if (latest && tvId !== latest.id) {
-      tv?.destroy(); container.innerHTML = "";
-      tv = ReelPlayer.for(container, { ...latest, coin: c() }, { onEnd: () => tv.play() });
-      tvId = latest.id; tv.play();
-      const btn = document.createElement("button"); btn.className = "btn tv-sound"; btn.textContent = "Sound on"; btn.type = "button";
-      btn.onclick = () => { const v = container.querySelector("video"); if (!v) return; v.muted = !v.muted; btn.textContent = v.muted ? "Sound on" : "Sound off"; if (!v.muted) v.play().catch(() => {}); };
-      container.appendChild(btn);
-    } else if (!latest && !container.querySelector(".static")) {
+    const trailer = c().trailer;
+    const want = tvMode || (trailer ? "trailer" : latest ? "episode" : "static");
+    const id = want === "episode" ? latest?.id : want;
+    if (tvId === id) { $(".tv")?.classList.toggle("on-air", stage > 0 || !!latest); return; }
+    tv?.destroy(); tv = null; container.innerHTML = "";
+    tvId = id;
+    const sound = document.createElement("button"); sound.className = "btn tv-sound"; sound.textContent = "Sound on"; sound.type = "button";
+    sound.onclick = () => { const v = container.querySelector("video"); if (!v) return; v.muted = !v.muted; sound.textContent = v.muted ? "Sound on" : "Sound off"; if (!v.muted) v.play().catch(() => {}); };
+    const nextUp = () => { tvMode = want === "trailer" && latest ? "episode" : trailer ? "trailer" : "episode"; tvId = null; mountTV(container); page?.update?.(); };
+    if (want === "trailer") {
+      tv = new TrailerPlayer(container, trailer, { onEnd: nextUp });
+      tv.play(); container.appendChild(sound);
+    } else if (want === "episode" && latest) {
+      tv = ReelPlayer.for(container, { ...latest, coin: c() }, { onEnd: nextUp });
+      tv.play(); container.appendChild(sound);
+    } else {
       container.innerHTML = `<div class="static"><span>${stage ? "Episode 1 is being made" : "Episode 1 premieres here"}</span></div>`;
     }
     $(".tv")?.classList.toggle("on-air", stage > 0 || !!latest);
   }
+  class TrailerPlayer {
+    constructor(container, src, opts) {
+      this.video = document.createElement("video"); this.video.src = src; this.video.muted = true; this.video.playsInline = true; this.video.preload = "auto";
+      this.video.addEventListener("ended", () => opts.onEnd?.());
+      container.appendChild(this.video);
+    }
+    play() { this.video.play().catch(() => {}); }
+    pause() { this.video.pause(); }
+    destroy() { this.video.pause(); this.video.removeAttribute("src"); this.video.remove(); }
+  }
+  // Keep the sound setting when the TV switches from the trailer to the episode.
+  document.addEventListener("play", (e) => { const v = e.target; if (v.tagName === "VIDEO" && v.closest("#screen")) { const btn = $("#screen .tv-sound"); if (btn && btn.textContent === "Sound off") v.muted = false; } }, true);
 
   // ---------- Page: Home (centered, the TV is the hero)
   function home() {}
@@ -161,13 +183,14 @@
         <strong id="tv-title"></strong>
         <span class="muted" id="tv-sub"></span>
         <div class="mini"><span id="tv-bar"></span></div>
+        <div class="channels" id="channels" role="group" aria-label="What to play"></div>
       </div>
 
       <div class="home-vote">${voteHTML(true)}</div>
 
       <div class="home-grid">
         <a class="tile" href="/live" data-link><span class="k">Live</span><h3>Watch it get made</h3><p>Fees landing, the script typing itself, the render bar moving.</p></a>
-        <a class="tile" href="/episodes" data-link><span class="k">Episodes</span><h3 id="tile-eps">The story so far</h3><p>Every episode, in order, with its cliffhanger.</p></a>
+        <a class="tile" href="/episodes" data-link><span class="k">Episodes</span><h3 id="tile-eps">The story so far</h3><p>Every season's episodes, in order, with their cliffhangers.</p></a>
         <a class="tile" href="/how" data-link><span class="k">How it works</span><h3>Fees pay for the show</h3><p>60% of every creator fee goes into the episode fund.</p></a>
       </div>
 
@@ -183,8 +206,11 @@
     const latest = ready()[0];
     mountTV($("#screen"));
     $("#home-status").textContent = stageWord(stage, number);
-    $("#tv-title").textContent = latest ? `Now playing: Episode ${latest.number}` : "Nothing aired yet";
-    $("#tv-sub").textContent = latest ? `“${latest.cliffhanger || latest.scenes.at(-1)?.line || latest.title}”` : "The pilot premieres the moment the fund is full.";
+    const onTrailer = tvId === "trailer";
+    $("#tv-title").textContent = onTrailer ? "Now playing: the BloxTV trailer" : latest ? `Now playing: Season ${latest.season}, Episode ${latest.number}` : "Nothing aired yet";
+    $("#tv-sub").textContent = onTrailer ? "Every coin gets its own show. Fees pay for the story." : latest ? `“${latest.cliffhanger || latest.scenes.at(-1)?.line || latest.title}”` : "The pilot premieres the moment the fund is full.";
+    $("#channels").innerHTML = [c().trailer && `<button class="chan ${onTrailer ? "on" : ""}" data-chan="trailer" type="button">Trailer</button>`, latest && `<button class="chan ${!onTrailer ? "on" : ""}" data-chan="episode" type="button">Episode ${latest.number}</button>`].filter(Boolean).join("");
+    document.querySelectorAll("[data-chan]").forEach((b) => b.onclick = () => { tvMode = b.dataset.chan; tvId = null; mountTV($("#screen")); home.update(); });
     const f = S.fund, p = stage === 0 ? f.progress : stage === 2 ? (ep.renderProgress || 0) : 1;
     $("#tv-bar").style.width = (p * 100).toFixed(1) + "%";
     $("#tile-eps").textContent = ready().length ? `${ready().length} episode${ready().length === 1 ? "" : "s"} so far` : "The story so far";
@@ -372,25 +398,34 @@
   // ---------- Page: Episodes
   function episodes() {}
   let listSig = "";
+  let seasonPick = null;
   episodes.html = () => `
     <section class="page wrap">
       <div class="page-head"><span class="eyebrow">Episodes</span><h1>The story so far</h1><p id="ep-summary"></p></div>
+      <div class="seasons" id="seasons" role="tablist" aria-label="Seasons"></div>
       <div class="posters" id="posters"></div>
     </section>`;
   episodes.update = () => {
-    const list = ready();
-    const sig = list.map((e) => e.id).join();
+    const all = ready();
+    const seasons = [...new Set(all.map((e) => e.season))].sort((a, b) => a - b);
+    const nextSeason = Math.ceil((all.length + 1) / (c().seasonLength || 10));
+    if (!seasons.includes(nextSeason)) seasons.push(nextSeason);
+    if (!seasons.includes(seasonPick)) seasonPick = seasons.at(-1);
+    const list = all.filter((e) => e.season === seasonPick);
+    const sig = seasonPick + ":" + list.map((e) => e.id).join();
     if (sig === listSig) return;
     listSig = sig;
-    $("#ep-summary").textContent = list.length ? `${list.length} episode${list.length === 1 ? "" : "s"} · ${sol(S.fund.spent)} of creator fees spent on video` : "No episodes yet. The pilot is being funded.";
+    $("#seasons").innerHTML = seasons.map((n) => `<button class="season ${n === seasonPick ? "on" : ""}" role="tab" aria-selected="${n === seasonPick}" data-season="${n}" type="button">Season ${n}<small>${all.filter((e) => e.season === n).length || "soon"}</small></button>`).join("");
+    document.querySelectorAll("[data-season]").forEach((b) => b.onclick = () => { seasonPick = Number(b.dataset.season); episodes.update(); });
+    $("#ep-summary").textContent = all.length ? `${all.length} episode${all.length === 1 ? "" : "s"} across ${seasons.length} season${seasons.length === 1 ? "" : "s"} · ${c().seasonLength} episodes a season · ${sol(S.fund.spent)} of creator fees spent on video` : "No episodes yet. The pilot is being funded.";
     $("#posters").innerHTML = list.map((e) => `
       <button class="poster" data-ep="${e.id}">
         ${e.videoUrl ? `<video src="${esc(e.videoUrl)}#t=1.5" muted playsinline preload="metadata"></video>` : `<div class="frame-still"></div>`}
         <span class="shade"></span>
         <span class="ep-play" aria-hidden="true">▶</span>
-        <span class="meta"><span class="ep-num">Episode ${e.number}</span><span class="ep-line">“${esc(e.cliffhanger || e.scenes.at(-1)?.line || e.title)}”</span><span class="ep-when">${ago(e.readyAt || e.createdAt)}</span></span>
+        <span class="meta"><span class="ep-num">S${e.season} · Episode ${e.number}</span><span class="ep-line">“${esc(e.cliffhanger || e.scenes.at(-1)?.line || e.title)}”</span><span class="ep-when">${ago(e.readyAt || e.createdAt)}</span></span>
         <span class="sr-only">Play ${esc(e.title)}</span>
-      </button>`).join("") + `<div class="poster empty"><span>Episode ${list.length + 1}<br><small>being funded</small></span></div>`;
+      </button>`).join("") + (seasonPick === seasons.at(-1) ? `<div class="poster empty"><span>Episode ${all.length + 1}<br><small>being funded</small></span></div>` : "");
     document.querySelectorAll("[data-ep]").forEach((b) => b.onclick = () => openPlayer(S.episodes.find((e) => e.id === b.dataset.ep)));
     document.querySelectorAll(".poster .frame-still").forEach((box, i) => ReelPlayer.still(box, { ...list[i], coin: c() }, 0));
   };
