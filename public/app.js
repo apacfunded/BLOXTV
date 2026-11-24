@@ -493,9 +493,7 @@
       <section class="card section">
         <span class="eyebrow">Creator fees</span>
         <h2 style="margin-top:10px">Every trade feeds the show.</h2>
-        <p class="muted" style="max-width:60ch">pump.fun pays creator fees on every trade. On BloxTV those fees are split the moment they land.</p>
-        <div class="split" aria-hidden="true"><div class="s1"><b>60%</b>Episode fund</div><div class="s2"><b>20%</b>Creator</div><div class="s3"><b>20%</b>Platform</div></div>
-        <div class="split-notes"><div><b>60% makes episodes.</b> Each time the fund reaches ${sol(S.fund.cost)}, the next episode is written, rendered and premiered on stream.</div><div><b>20% to the creator.</b> Paid out like any pump.fun coin.</div><div><b>20% runs the platform.</b> Hosting, the stream and the video credits.</div></div>
+        <p class="muted" style="max-width:60ch">pump.fun pays creator fees on every trade of $${esc(c().ticker)}. Those fees fill the episode fund. Each time it reaches ${sol(S.fund.cost)}, the next episode is written, rendered and premiered on stream.</p>
       </section>
     </section>`;
   towns.update = () => {
@@ -512,7 +510,7 @@
       <div class="page-head"><span class="eyebrow">How it works</span><h1>Fees in, episodes out</h1><p>A memecoin that makes its own TV show, paid for by the people trading it.</p></div>
       <div class="cols">
         <section class="card"><h2>The loop</h2><ol class="steps">
-          <li><b>Trade $${esc(c().ticker)} on pump.fun.</b> Every trade pays a creator fee, and 60% of it goes into the episode fund.</li>
+          <li><b>Trade $${esc(c().ticker)} on pump.fun.</b> Every trade pays a creator fee, and the fees fill the episode fund.</li>
           <li><b>Vote while it fills.</b> Each episode ends on a cliffhanger with three ways it could go. Type A, B or C in the pump.fun chat, or vote here.</li>
           <li><b>At ${sol(S.fund.cost)} the episode gets made.</b> The winning option becomes the story. The script is written live, scene by scene, then rendered.</li>
           <li><b>It premieres on the stream.</b> Then the next fund opens and the next vote starts.</li>
@@ -541,7 +539,7 @@
       <div class="page-head"><span class="soon">Opens after $${esc(c().ticker)}</span><h1>Launch a town</h1><p>Every coin on BloxTV gets its own narrator, its own town and its own 24/7 show, paid for by its trading fees. Here's the deal.</p></div>
       <div class="home-grid">
         <div class="tile"><span class="k">1 · Launch</span><h3>No launch fee</h3><p>You pay pump.fun's normal costs and nothing else. Give your town a name and three facts.</p></div>
-        <div class="tile"><span class="k">2 · Fees</span><h3>Trades pay for the show</h3><p>60% of every creator fee goes into your town's episode fund. 20% is yours. 20% runs the platform.</p></div>
+        <div class="tile"><span class="k">2 · Fees</span><h3>Trades pay for the show</h3><p>When launches open, 60% of every creator fee goes into your town's episode fund, 20% is yours and 20% runs the platform.</p></div>
         <div class="tile"><span class="k">3 · Show</span><h3>Episodes make themselves</h3><p>At ${sol(S.fund.cost)} the next episode is written, voiced and rendered, then premieres on your stream.</p></div>
       </div>
       <div class="cols section">

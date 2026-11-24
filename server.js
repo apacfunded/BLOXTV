@@ -24,7 +24,7 @@ for (const ep of [...getDb().episodes]) if (ep.status === "writing" || ep.status
   getDb().fund.spent -= ep.costSol;
   if (!ep.test) getDb().fund.balance += ep.costSol; // a test episode's fees were pretend, so don't start a real one with them
 }
-// Only the fund's share of each creator fee counts toward the next episode (60% by default).
+// The fund's share of each creator fee counts toward the next episode (all of it for the main coin).
 startFeeWatcher((sol, meta = {}) => addFees(sol * COIN.fundShare, typeof meta === "string" ? { source: meta } : meta));
 ensurePoll();
 if (COIN.mint && process.env.PUMP_CHAT !== "0") startPumpChat(COIN.mint, onChatMessage, { onStatus: setChatStatus });
