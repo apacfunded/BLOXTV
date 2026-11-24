@@ -42,7 +42,7 @@ def main():
         clip = os.path.join(base, s["clip"])
         vo = os.path.join(base, s["vo"]) if s.get("vo") else None
         vo_d = probe(vo) if vo else max(2.0, len(s["line"].split()) * 0.38 + 0.8)  # no narration: time captions to the words
-        dur = max(vo_d + PAD_BEFORE + PAD_AFTER, 2.5)
+        dur = max(vo_d + PAD_BEFORE + PAD_AFTER, 2.5) + float(s.get("hold", 0))  # "hold": extra silent seconds after the line (cliffhangers)
         part = os.path.join(tmp, f"p{n}.mp4")
         inputs = ["-i", clip] + (["-i", vo] if vo else [])
         audio = (f"[0:a]volume=0.35,apad,atrim=duration={dur}[amb];"
