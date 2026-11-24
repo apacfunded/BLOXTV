@@ -5,3 +5,5 @@ coin.config.json
 pilot/
 ads/build/
 *.zip
+.env.local
+.env.*.local

@@ -3,13 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "In My Town — a coin launchpad where trading fees pay for an 'In my town...' story video for every coin.",
+  "description": "In My Town \u2014 a coin launchpad where trading fees pay for an 'In my town...' story video for every coin.",
   "scripts": {
     "start": "node server.js",
-    "test": "node --test test/"
+    "test": "node --test test/",
+    "example:seedance": "node examples/higgsfield/index.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.13.0",
+    "@higgsfield/client": "^0.2.6",
     "@solana/web3.js": "^1.99.0",
     "ws": "^8.23.0"
   },
