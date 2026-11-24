@@ -581,7 +581,7 @@
     $("#brand-name").textContent = c().name;
     const buy = $("#buy"); buy.textContent = `Buy $${c().ticker}`;
     if (c().pumpUrl) buy.href = c().pumpUrl; else buy.setAttribute("aria-disabled", "true");
-    for (const id of ["x-link", "x-foot"]) { const a = $("#" + id); if (c().links?.x) { a.href = c().links.x; a.hidden = false; } }
+    for (const id of ["x-link", "x-foot"]) { const a = $("#" + id); if (a && c().links?.x) { a.href = c().links.x; a.hidden = false; } }
     document.documentElement.style.setProperty("--c", c().color);
   }
   async function refresh() {
@@ -610,5 +610,5 @@
     if (stage === 3 && now() - ready()[0].readyAt >= 90_000) page?.update();
   }, 1000);
 
-  refresh().then(connect).catch(() => { app.innerHTML = `<div class="empty"><h2>We couldn't load the town</h2><p>Check that the server is running, then refresh.</p></div>`; });
+  refresh().then(connect).catch((err) => { console.error("load failed:", err); app.innerHTML = `<div class="empty"><h2>We couldn't load the town</h2><p>Check that the server is running, then refresh.</p></div>`; });
 })();
