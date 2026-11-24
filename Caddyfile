@@ -1,0 +1,8 @@
+# HTTPS for the site. Caddy gets and renews the certificate automatically.
+# DOMAIN comes from .env (e.g. DOMAIN=bloxtv.lol).
+{$DOMAIN}, www.{$DOMAIN} {
+	encode gzip
+	reverse_proxy web:3000 {
+		flush_interval -1
+	}
+}

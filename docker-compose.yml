@@ -1,12 +1,13 @@
 # One command runs the whole show: `docker compose up -d`
 #   web       the site, the live board, the fee watcher, the chat votes and the episode pipeline
 #   streamer  renders /stream and pushes it to pump.fun over RTMP, 24/7
+#   caddy     HTTPS for your domain (DOMAIN in .env), certificate handled automatically
 # Put secrets in a .env file next to this (see .env.example).
 services:
   web:
     build: .
     restart: unless-stopped
-    ports: ["3000:3000"]
+    expose: ["3000"]
     env_file: .env
     environment:
       PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
@@ -22,3 +23,18 @@ services:
     environment:
       SITE_URL: http://web:3000
     shm_size: "1gb"
+  caddy:
+    image: caddy:2.8.4
+    restart: unless-stopped
+    depends_on: [web]
+    ports: ["80:80", "443:443"]
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
