@@ -102,7 +102,7 @@
   let myVote = null; try { myVote = JSON.parse(localStorage.getItem("imt-vote") || "null"); } catch {}
   function renderVote(poll) {
     const box = $("#vote-opts"); if (!box) return;
-    if (!poll) { box.innerHTML = ""; $("#vote-q").textContent = "Writing the cliffhanger now. The vote for what happens next opens in a moment."; $("#vote-cliff").hidden = true; $("#vote-foot").textContent = ""; return; }
+    if (!poll) { box.innerHTML = ""; $("#vote-q").textContent = ready().length || S.producing ? "Writing the cliffhanger now. The vote for what happens next opens in a moment." : "The first vote opens the moment the pilot is written. Every episode ends on a cliffhanger, and you pick what happens next."; $("#vote-cliff").hidden = true; $("#vote-foot").textContent = ""; return; }
     const t = poll.tally, max = Math.max(1, ...Object.values(t.counts));
     const mine = myVote && myVote.pollId === poll.id ? myVote.key : null;
     $("#vote-q").textContent = poll.question;

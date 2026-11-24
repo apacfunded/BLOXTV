@@ -3,12 +3,12 @@
   "ticker": "BLOXTV",
   "mint": "",
   "creatorWallet": "",
-  "town": "Puddleton",
+  "town": "Candlewick",
   "color": "#2563eb",
   "facts": {
-    "weird": "It has rained for 400 years and everyone owns a boat instead of a car",
-    "who": "Ducks run the post office and they are strict",
-    "night": "The puddles glow and you can see another town underneath"
+    "weird": "Everyone launches memecoins. The KOLs live on the Hill and retail lives down in the Flats",
+    "who": "Ollie, a kid who can see which trades win and has to hide it, his best friend Milo, Mrs. Pearl next door, the Whale and his Callers up on the Hill, and the Bots",
+    "night": "Every window glows with a chart. The Flats go red. The Hill stays green"
   },
   "episodeCostSol": 0.5,
   "countExistingFees": false,
