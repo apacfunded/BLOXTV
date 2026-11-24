@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { COIN } from "./lib/config.js";
 import { load, getDb } from "./lib/store.js";
-import { state, addFees, subscribe, completeEpisode, maybeProduce, renderProgress, setViewers, onChatMessage, siteVote, setChatStatus, startTestEpisode } from "./lib/show.js";
+import { state, addFees, subscribe, completeEpisode, maybeProduce, renderProgress, setViewers, onChatMessage, siteVote, setChatStatus, startTestEpisode, clearPreviewEpisodes } from "./lib/show.js";
 import { ensurePoll } from "./lib/votes.js";
 import { startPumpChat } from "./lib/pumpchat.js";
 import { episodeFile } from "./lib/assemble.js";
@@ -52,6 +52,13 @@ const routes = [
     const ip = req.socket.remoteAddress || "";
     if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(ip)) return [403, { error: "Admin routes only work from inside the server." }];
     const r = startTestEpisode(body.scenes);
+    return r.error ? [409, r] : r;
+  }],
+  // Admin: remove preview-reel / failed episodes so only real renders stay. Localhost only.
+  ["POST", /^\/api\/admin\/clear-previews$/, (_, body, req) => {
+    const ip = req.socket.remoteAddress || "";
+    if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(ip)) return [403, { error: "Admin routes only work from inside the server." }];
+    const r = clearPreviewEpisodes();
     return r.error ? [409, r] : r;
   }],
   ["POST", /^\/api\/vote$/, (_, body) => {
