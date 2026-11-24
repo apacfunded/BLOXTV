@@ -22,6 +22,8 @@ services:
     env_file: .env
     environment:
       SITE_URL: http://web:3000
+    volumes:
+      - ./data/episodes:/out
     shm_size: "1gb"
   caddy:
     image: caddy:2.8.4

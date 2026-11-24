@@ -2,7 +2,11 @@
 # Renders $SITE_URL/stream in a headless Chromium and streams it to $RTMP_URL/$STREAM_KEY.
 # Restarts every piece if it dies, so the stream stays up around the clock.
 set -u
-: "${SITE_URL:?set SITE_URL}"; : "${RTMP_URL:?set RTMP_URL (from pump.fun > Start Livestream > Generate RTMP Credentials)}"; : "${STREAM_KEY:?set STREAM_KEY}"
+: "${SITE_URL:?set SITE_URL}"
+# SELFTEST_SECONDS=20 records that many seconds to /out/stream-test/episode.mp4 instead of streaming, then exits.
+# The web service serves it at /episodes/stream-test.mp4, so you can watch what the stream would look like.
+SELFTEST=${SELFTEST_SECONDS:-}
+if [ -z "$SELFTEST" ]; then : "${RTMP_URL:?set RTMP_URL (from pump.fun > Start Livestream > Generate RTMP Credentials)}"; : "${STREAM_KEY:?set STREAM_KEY}"; fi
 W=${WIDTH:-1920}; H=${HEIGHT:-1080}; FPS=${FPS:-30}
 export DISPLAY=:99
 export XDG_RUNTIME_DIR=/tmp/runtime-$(id -u); mkdir -p "$XDG_RUNTIME_DIR"
@@ -32,15 +36,25 @@ encoder() {
     -c:v libx264 -preset veryfast -tune zerolatency -pix_fmt yuv420p -g "$((FPS * 2))" -keyint_min "$FPS" \
     -b:v "${VIDEO_BITRATE:-4500k}" -maxrate "${VIDEO_BITRATE:-4500k}" -bufsize "$((2 * ${VIDEO_BITRATE%k}))k" \
     -c:a aac -b:a "${AUDIO_BITRATE:-160k}" -ar 44100 -ac 2 \
-    -f flv "${RTMP_URL%/}/${STREAM_KEY}"
+    "$@"
 }
+if [ -n "$SELFTEST" ]; then
+  mkdir -p /out/stream-test
+  log "self-test: recording ${SELFTEST}s of the stream to /out/stream-test/episode.mp4"
+  browser & BPID=$!
+  sleep 8
+  encoder -t "$SELFTEST" -y -f mp4 -movflags +faststart /out/stream-test/episode.mp4; code=$?
+  kill "$BPID" 2>/dev/null; wait "$BPID" 2>/dev/null
+  log "self-test done (ffmpeg exit $code). Open /episodes/stream-test.mp4 on the site to watch it."
+  exit $code
+fi
 
 while true; do
   log "starting browser"
   browser & BPID=$!
   sleep 6
   log "starting encoder -> ${RTMP_URL%/}/********"
-  encoder; code=$?
+  encoder -f flv "${RTMP_URL%/}/${STREAM_KEY}"; code=$?
   log "encoder exited ($code), restarting in 5s"
   kill "$BPID" 2>/dev/null; wait "$BPID" 2>/dev/null
   sleep 5
