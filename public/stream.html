@@ -78,6 +78,13 @@
   .premiere { position:absolute; inset:0; display:grid; place-items:center; background:rgba(18,6,7,.9); color:#fff; font:700 150px/1 'Chakra Petch'; text-transform:uppercase; text-align:center; opacity:0; pointer-events:none; transition:opacity .4s; }
   .premiere small { display:block; font:500 44px Rubik; margin-top:20px; color:var(--muted); }
   .premiere.show { opacity:1; }
+  /* Full-screen premiere: the new episode fills the whole stream, a blurred copy fills the sides. */
+  .theater { position:absolute; inset:0; z-index:5; background:#000; display:none; }
+  .theater.show { display:block; }
+  .theater .blur { position:absolute; inset:-40px; width:calc(100% + 80px); height:calc(100% + 80px); object-fit:cover; filter:blur(40px) brightness(.45); }
+  .theater .main { position:absolute; top:0; bottom:0; left:50%; transform:translateX(-50%); height:100%; aspect-ratio:9/16; object-fit:cover; box-shadow:0 0 120px rgba(0,0,0,.8); }
+  .theater .badge { position:absolute; top:40px; left:50%; transform:translateX(-50%); background:var(--live); color:#fff; font:700 30px 'Chakra Petch'; letter-spacing:.08em; padding:10px 24px; border-radius:10px; animation:blink 1.2s steps(2) infinite; }
+  .theater .title { position:absolute; bottom:40px; left:50%; transform:translateX(-50%); white-space:nowrap; font:700 34px 'Chakra Petch'; color:#fff; text-shadow:0 2px 10px #000; }
   @media (prefers-reduced-motion: reduce) { .dot, .caret, .script li, .fee { animation:none } }
 </style>
 </head>
@@ -104,6 +111,7 @@
     <div class="foot"><span>Every trade buys the next episode.</span><code id="ca"></code></div>
   </div>
   <div class="premiere" id="premiere"></div>
+  <div class="theater" id="theater"></div>
 </div>
 <script src="/reel.js"></script>
 <script>
@@ -126,7 +134,7 @@
   function playNext() {
     const ready = S.episodes.filter((e) => e.status === "ready");
     if (!ready.length) { $("#tag").textContent = "COMING SOON"; return; }
-    if (!queue.length) queue = ready.map((e) => e.id); // newest first, then loop
+    if (!queue.length) queue = ready.slice().sort((a, b) => a.number - b.number).map((e) => e.id); // in story order, then loop
     const ep = ready.find((e) => e.id === queue.shift()) || ready[0];
     start(ep, "NOW PLAYING");
   }
@@ -138,11 +146,47 @@
     player.play();
     renderStatus();
   }
+  // Full-screen playback (theater): one episode fills the stream with sound; the sides show a blurred copy.
+  function theater(ep, badge, onDone) {
+    const t = $("#theater");
+    t.innerHTML = `<video class="blur" src="${esc(ep.videoUrl)}" muted playsinline></video><video class="main" src="${esc(ep.videoUrl)}" playsinline></video>
+      <div class="badge">${esc(badge)}</div><div class="title">${esc(ep.cliffhanger ? "“" + ep.cliffhanger + "”" : ep.title)}</div>`;
+    t.classList.add("show");
+    const [blur, main] = t.querySelectorAll("video");
+    let finished = false;
+    const finish = () => { if (finished) return; finished = true; setTimeout(onDone, 1200); };
+    main.addEventListener("ended", finish);
+    main.addEventListener("error", finish);
+    blur.play().catch(() => {}); main.play().catch(() => { main.muted = true; main.play().catch(finish); });
+  }
+  const closeTheater = () => { $("#theater").classList.remove("show"); $("#theater").innerHTML = ""; };
+
+  // A new episode premieres full screen, then the normal layout returns with it in the TV.
+  // If it closes a season, the whole season plays back to back first.
   function premiere(ep) {
     $("#premiere").innerHTML = `<div>PREMIERE<small>Episode ${ep.number}: ${esc(ep.title)}</small></div>`;
     $("#premiere").classList.add("show");
     player?.pause();
-    setTimeout(() => { $("#premiere").classList.remove("show"); queue = []; start(ep, "PREMIERE"); }, 4000);
+    const back = () => { closeTheater(); queue = []; start(ep, "NOW PLAYING"); };
+    const seasonLen = S.coin.seasonLength || 10;
+    const after = ep.number % seasonLen === 0 ? () => marathon(ep.season, back) : back;
+    setTimeout(() => {
+      $("#premiere").classList.remove("show");
+      if (!ep.videoUrl) return after();
+      theater(ep, `PREMIERE · EPISODE ${ep.number}`, after);
+    }, 3000);
+  }
+  // Season marathon: every episode of the season, in order, full screen.
+  function marathon(season, onDone) {
+    const eps = S.episodes.filter((e) => e.status === "ready" && e.videoUrl && e.season === season).sort((a, b) => a.number - b.number);
+    $("#premiere").innerHTML = `<div>SEASON ${season}<small>The whole season, from the start</small></div>`;
+    $("#premiere").classList.add("show");
+    setTimeout(() => {
+      $("#premiere").classList.remove("show");
+      let i = 0;
+      const next = () => { if (i >= eps.length) return onDone(); const e = eps[i++]; theater(e, `SEASON ${season} · EPISODE ${e.number} OF ${eps.length}`, next); };
+      next();
+    }, 3000);
   }
 
   function renderStatus() {
