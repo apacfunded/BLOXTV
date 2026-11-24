@@ -67,10 +67,14 @@ whip_encoder() {
     -c:v libx264 -preset "${PRESET:-ultrafast}" -tune zerolatency -profile:v baseline -bf 0 -threads 0 -pix_fmt yuv420p \
     -g "$((FPS * 2))" -keyint_min "$FPS" \
     -b:v "${VIDEO_BITRATE:-4500k}" -maxrate "${VIDEO_BITRATE:-4500k}" -bufsize "$((2 * ${VIDEO_BITRATE%k}))k" \
-    -c:a libopus -b:a "${AUDIO_BITRATE:-160k}" -ar 48000 -ac 2 \
+    -fps_mode cfr -r "$FPS" \
+    -c:a libopus -b:a "${AUDIO_BITRATE:-128k}" -ar 48000 -ac 2 -application lowdelay \
     -f whip -authorization "$STREAM_KEY" "$@"
 }
+# Any browser left over from an earlier round would keep playing sound into the stream: clear them first.
+clear_browsers() { pkill -9 -f -- "--user-data-dir=/tmp/chrome" 2>/dev/null; rm -rf /tmp/chrome/Singleton* 2>/dev/null; }
 while true; do
+  clear_browsers
   log "starting browser"
   browser & BPID=$!
   sleep 6
@@ -84,5 +88,6 @@ while true; do
   esac
   log "encoder exited ($code), restarting in 5s"
   kill "$BPID" 2>/dev/null; wait "$BPID" 2>/dev/null
+  clear_browsers
   sleep 5
 done
