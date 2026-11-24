@@ -5,6 +5,8 @@ import fs from "node:fs";
 const file = process.argv[2];
 if (!file) { console.log("Usage: node tools/import.mjs <episode.json>"); process.exit(1); }
 const body = JSON.parse(fs.readFileSync(file, "utf8"));
+// The server may still be starting after a rebuild: wait for it.
+for (let i = 0; i < 60; i++) { try { await fetch("http://localhost:3000/api/state"); break; } catch { if (i === 0) console.log("Waiting for the server to start…"); await new Promise((r) => setTimeout(r, 1000)); } }
 console.log(`Importing "${body.title}" (${body.scenes.length} scenes)… adding narration, captions and music. This takes a minute or two.`);
 const res = await fetch("http://localhost:3000/api/admin/import-episode", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
 const out = await res.json();
