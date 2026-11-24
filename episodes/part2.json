@@ -1,0 +1,81 @@
+{
+  "title": "Candlewick — chapter 2: Then Milo told me he's going up the Hill tomorrow",
+  "premise": "Ollie goes outside to face the Bot",
+  "cliffhanger": "Then Milo told me he's going up the Hill tomorrow. To become a Caller.",
+  "nextOptions": [
+    "Ollie follows Milo up the Hill in secret",
+    "Ollie tries to stop Milo at the gate",
+    "Ollie lets him go and watches on the big screen"
+  ],
+  "scenes": [
+    {
+      "line": "In my town, the Bots never stop walking. Last night, one stopped at my house.",
+      "setting": "the flooded Flats street at dawn",
+      "action": "a line of grey Bots marches through the water, Ollie watches from his front step with a mug",
+      "mood": "day"
+    },
+    {
+      "line": "I went outside. It held out a note. Two words. Nice trade.",
+      "setting": "outside Ollie's house at night under the street lamp",
+      "action": "the Bot holds out a folded note, Ollie takes it",
+      "mood": "night"
+    },
+    {
+      "line": "Mrs. Pearl read it once. She said one word. Whale. Then she shut her door.",
+      "setting": "Mrs. Pearl's porch in the morning",
+      "action": "Mrs. Pearl reads the note close to her glasses, turns to her door",
+      "mood": "day"
+    },
+    {
+      "line": "So today I lost three trades in the square. Loudly. A Bot watched the whole thing.",
+      "setting": "the Launch Pad square at midday",
+      "action": "Ollie groans holding up a red chart, neighbours laugh, a Bot watches from the edge",
+      "mood": "day"
+    },
+    {
+      "line": "Then the Callers called a new coin on the big screen. The whole Flats bought it. Even Milo.",
+      "setting": "the Flats docks under the giant screen at sunset",
+      "action": "three Callers point at a rocket chart, the crowd holds phones up, fireworks",
+      "mood": "sunset"
+    },
+    {
+      "line": "It was at zero by dinner. The Callers were still smiling.",
+      "setting": "the docks at dusk, water thick with dead coins",
+      "action": "Milo sits on the dock staring at a flat red line, Ollie looks at him",
+      "mood": "sunset"
+    },
+    {
+      "line": "Then Milo told me he's going up the Hill tomorrow. To become a Caller.",
+      "setting": "a rooftop in the Flats at night",
+      "action": "Milo points up at the glowing Hill, Ollie sits on the roof edge looking at Milo, worried",
+      "mood": "night"
+    }
+  ],
+  "keyframes": [
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174802_edcdbb73-cc0c-4eaa-8a21-7e13b78e1813.png",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174805_fcc0107c-cdc3-4377-a0d2-504dc31166e2.png",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174811_ec735582-862f-48c4-8973-dd92b2c67d7c.png",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174801_9b1312bf-b3c0-4c0d-8230-59039477096d.png",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174801_46806d07-5a2b-4194-b312-a0e80693586e.png",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174803_71ca33d9-65d6-4db1-9631-2f025e1fdd0f.png",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174804_d0a968d4-53a1-46dc-84f8-39f34fa2ab4a.png"
+  ],
+  "narration": [
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174818_73ed3f02-55a6-474b-82d1-d8b47f66922b.mp3",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174815_dd52f8e9-6f9b-4f70-b351-9768f0d707ac.mp3",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174815_4fecdd84-1e20-4681-b7f6-378a2728ada1.mp3",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174815_7776a1ad-6eeb-4699-b50a-b29a277af364.mp3",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174817_ee731637-b63c-4509-b7c8-447cc7c73a3a.mp3",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174815_53a93c6b-debb-4a82-8376-cff6e8d90225.mp3",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_174816_8cd48821-9210-492b-b69c-07bb504e4e05.mp3"
+  ],
+  "clips": [
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_183030_4f7ae9a4-8d96-4ad9-932e-77cf752f22b8.mp4",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_183028_d09334b9-98e0-48fc-91b0-61e3bf49535c.mp4",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_183028_e4b89ffd-e7c9-4673-9146-cc2c69ae3294.mp4",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_183028_762bbc7b-8f1d-4148-b49d-b441d3c8dc6e.mp4",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_183030_b9730028-6a4b-4242-8690-043204b13471.mp4",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_183028_1a43bbae-7273-4b38-bf02-5217e34b2a41.mp4",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_183027_a08f92de-68de-4bfa-ab0e-7c45379f194e.mp4"
+  ]
+}
