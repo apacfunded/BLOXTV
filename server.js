@@ -16,10 +16,13 @@ const DEV = process.env.DEV_TOOLS === "1";
 const TYPES = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".mp4": "video/mp4", ".mp3": "audio/mpeg" };
 
 load();
-// An episode left mid-production by a restart gets refunded and retried.
-for (const ep of [...getDb().episodes]) if (ep.status === "writing" || (ep.status === "rendering" && provider() === "preview")) {
+// An episode left mid-production by a restart gets refunded and retried: the render ran inside
+// the old process, so nothing is working on it any more.
+for (const ep of [...getDb().episodes]) if (ep.status === "writing" || ep.status === "rendering") {
+  console.log(`[episode] ${ep.id} was mid-production when the server stopped; ${ep.test ? "dropping the test episode" : `refunding ${ep.costSol} SOL and retrying`}.`);
   getDb().episodes.splice(getDb().episodes.indexOf(ep), 1);
-  getDb().fund.balance += ep.costSol; getDb().fund.spent -= ep.costSol;
+  getDb().fund.spent -= ep.costSol;
+  if (!ep.test) getDb().fund.balance += ep.costSol; // a test episode's fees were pretend, so don't start a real one with them
 }
 startFeeWatcher(addFees);
 ensurePoll();
