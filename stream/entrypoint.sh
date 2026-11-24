@@ -42,7 +42,7 @@ encoder() {
   ffmpeg -hide_banner -loglevel warning \
     -probesize 20M -f x11grab -framerate "$FPS" -video_size "${W}x${H}" -draw_mouse 0 -thread_queue_size 1024 -i :99 \
     "${AUDIO_IN[@]}" \
-    -c:v libx264 -preset veryfast -tune zerolatency -pix_fmt yuv420p -g "$((FPS * 2))" -keyint_min "$FPS" \
+    -c:v libx264 -preset "${PRESET:-ultrafast}" -tune zerolatency -threads 0 -pix_fmt yuv420p -g "$((FPS * 2))" -keyint_min "$FPS" \
     -b:v "${VIDEO_BITRATE:-4500k}" -maxrate "${VIDEO_BITRATE:-4500k}" -bufsize "$((2 * ${VIDEO_BITRATE%k}))k" \
     -c:a aac -b:a "${AUDIO_BITRATE:-160k}" -ar 44100 -ac 2 \
     "$@"
