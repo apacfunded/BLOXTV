@@ -1,0 +1,56 @@
+{
+  "title": "Candlewick \u2014 chapter 5: The Photo",
+  "premise": "Mrs. Pearl offers to take the blame",
+  "cliffhanger": "Then she took off her glasses. Her eyes were glowing green.",
+  "nextOptions": [
+    "Mrs. Pearl tells Ollie how she lost the Hill",
+    "Ollie asks why she never said anything",
+    "Someone is listening at the window"
+  ],
+  "scenes": [
+    {
+      "line": "In my town, a thousand SOL turns everyone into a detective. Even the ducks.",
+      "setting": "",
+      "action": "The kid with the magnifying glass leans closer to the puddle; the grandma swings her binoculars; the man taps the wanted poster. The two ducks hold the envelope up to the light and squint at it, then at each other. Ollie walks straight through the middle, sipping from his mug, and nobody looks at him.",
+      "mood": "day"
+    },
+    {
+      "line": "At midnight, Mrs. Pearl knocked on my door. She said: let them think it's me.",
+      "setting": "",
+      "action": "Rain falls past the open door; Mrs. Pearl raises her lantern a little. Ollie's eyebrows rise in surprise. Mrs. Pearl's mouth stays a firm line; she steps half a step closer, calm.",
+      "mood": "night"
+    },
+    {
+      "line": "I said no. She said: I've done this before.",
+      "setting": "",
+      "action": "Ollie shakes his head firmly twice. Mrs. Pearl smiles very slightly. She slides the dented tin box across the table toward him; steam rises from the mugs.",
+      "mood": "night"
+    },
+    {
+      "line": "Then she showed me a photo. Old. From the Hill.",
+      "setting": "",
+      "action": "Mrs. Pearl's arm lifts the old photo out of the tin box. The photo turns slightly toward the camera. Ollie's hat brim leans in from the edge; the lamp flickers once.",
+      "mood": "night"
+    },
+    {
+      "line": "It was her. Young. Standing next to a boy with a gold chain.",
+      "setting": "",
+      "action": "The camera slowly drifts across the old photo from the girl to the boy. Dust specks float over the faded image. The drift stops on the boy's thin gold chain.",
+      "mood": "night"
+    },
+    {
+      "line": "The boy was the Whale.",
+      "setting": "",
+      "action": "Very slow push-in on the boy's face in the old photo. His smirk and the gold chain fill the frame. Nothing else moves; a scratch on the photo catches the light.",
+      "mood": "night"
+    },
+    {
+      "line": "Then she took off her glasses. Her eyes were glowing green.",
+      "setting": "",
+      "action": "Mrs. Pearl lowers her glasses slowly. Her eyes glow brighter green and light her cheeks and the photo on the table. Ollie, at the edge, does not move. Rain on the window. Hold.",
+      "mood": "night"
+    }
+  ],
+  "videoFile": "episodes/part5.mp4",
+  "clips": []
+}

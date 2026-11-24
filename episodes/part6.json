@@ -1,0 +1,56 @@
+{
+  "title": "Candlewick \u2014 chapter 6: Before the Bots",
+  "premise": "Mrs. Pearl tells Ollie how she lost the Hill",
+  "cliffhanger": "Then we heard footsteps on the dock. Too many. Walking in step.",
+  "nextOptions": [
+    "Ollie and Mrs. Pearl escape through the canal",
+    "Ollie goes out to face the Bots alone",
+    "Milo shows up first and leads the Bots away"
+  ],
+  "scenes": [
+    {
+      "line": "In my town, the green eye runs in the Flats. Mrs. Pearl had it first.",
+      "setting": "",
+      "action": "Mrs. Pearl looks down into her tea, her eyes glowing softly. Ollie listens, his own eye glowing the same green. She looks up at him.",
+      "mood": "night"
+    },
+    {
+      "line": "She and the Whale were kids down here. They traded together. They never lost.",
+      "setting": "",
+      "action": "Flashback in faded colours: the two kids on the dock tap their old phones. Green sparkles rise from the screens. They laugh and bump shoulders.",
+      "mood": "day"
+    },
+    {
+      "line": "Then one day, he won in public. Everyone saw.",
+      "setting": "",
+      "action": "The boy on the crate thrusts his phone higher, shouting. The crowd stares up at him. The girl at the edge reaches out to stop him, too late.",
+      "mood": "day"
+    },
+    {
+      "line": "His eye went dark. Hers didn't.",
+      "setting": "",
+      "action": "The boy touches his eye; the green fades to dead grey. The girl's eye keeps glowing. They look at each other. Hold.",
+      "mood": "sunset"
+    },
+    {
+      "line": "He went up the Hill and built the Bots, so he'd never need an eye again.",
+      "setting": "",
+      "action": "The young man in the white suit turns the wrench on the half-built Bot. The Bot's blank head turns up toward him. Behind him the rows of Bots stand perfectly still.",
+      "mood": "night"
+    },
+    {
+      "line": "She stayed down here. Hiding. For fifty years.",
+      "setting": "",
+      "action": "Present day: Mrs. Pearl pulls the heavy curtain closed. Her face disappears behind it. Rain; the green Hill glows far above.",
+      "mood": "night"
+    },
+    {
+      "line": "Then we heard footsteps on the dock. Too many. Walking in step.",
+      "setting": "",
+      "action": "The line of Bots marches along the dock in perfect step. The front Bot stops at the bottom of the steps. Ollie and Mrs. Pearl stay frozen inside. Hold.",
+      "mood": "night"
+    }
+  ],
+  "videoFile": "episodes/part6.mp4",
+  "clips": []
+}
