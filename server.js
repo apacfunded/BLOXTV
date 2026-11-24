@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { COIN } from "./lib/config.js";
 import { load, getDb } from "./lib/store.js";
-import { state, addFees, subscribe, completeEpisode, maybeProduce, renderProgress, setViewers, onChatMessage, siteVote, setChatStatus } from "./lib/show.js";
+import { state, addFees, subscribe, completeEpisode, maybeProduce, renderProgress, setViewers, onChatMessage, siteVote, setChatStatus, startTestEpisode } from "./lib/show.js";
 import { ensurePoll } from "./lib/votes.js";
 import { startPumpChat } from "./lib/pumpchat.js";
 import { episodeFile } from "./lib/assemble.js";
@@ -44,6 +44,13 @@ setInterval(() => { for (const res of clients) res.write(": ping\n\n"); }, 25_00
 
 const routes = [
   ["GET", /^\/api\/state$/, () => ({ ...state(), videoProvider: provider(), watching: watchedAddresses(), devTools: DEV })],
+  // Admin: make one short test episode now. Only from inside the server (localhost), never through the website.
+  ["POST", /^\/api\/admin\/test-episode$/, (_, body, req) => {
+    const ip = req.socket.remoteAddress || "";
+    if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(ip)) return [403, { error: "Admin routes only work from inside the server." }];
+    const r = startTestEpisode(body.scenes);
+    return r.error ? [409, r] : r;
+  }],
   ["POST", /^\/api\/vote$/, (_, body) => {
     const id = String(body.voter || "").slice(0, 40), key = String(body.key || "").toUpperCase();
     if (!id) return [400, { error: "Missing voter id." }];
