@@ -86,6 +86,7 @@
 
         <section class="panel votes" id="vote" aria-labelledby="vote-h">
           <div class="panel-head"><h3 id="vote-h">Vote on the next episode</h3><span class="muted small" id="vote-src"></span></div>
+          <blockquote class="cliff" id="vote-cliff" hidden></blockquote>
           <p class="muted small" id="vote-q"></p>
           <div class="vote-opts" id="vote-opts" role="group" aria-label="Vote options"></div>
           <p class="muted small" id="vote-foot"></p>
@@ -279,10 +280,12 @@
   let myVote = null; try { myVote = JSON.parse(localStorage.getItem("imt-vote") || "null"); } catch {}
   function renderVote(poll) {
     const box = $("#vote-opts"); if (!box) return;
-    if (!poll) { box.innerHTML = ""; $("#vote-q").textContent = "Voting opens when the next round of funding starts."; $("#vote-foot").textContent = ""; return; }
+    if (!poll) { box.innerHTML = ""; $("#vote-q").textContent = "Writing the cliffhanger now. The vote for what happens next opens in a moment."; $("#vote-cliff").hidden = true; $("#vote-foot").textContent = ""; return; }
     const t = poll.tally, max = Math.max(1, ...Object.values(t.counts));
     const mine = myVote && myVote.pollId === poll.id ? myVote.key : null;
     $("#vote-q").textContent = poll.question;
+    const cl = $("#vote-cliff"); cl.hidden = !poll.cliffhanger;
+    if (poll.cliffhanger) cl.innerHTML = `<span>Episode ${poll.fromEpisode} ended on</span>“${esc(poll.cliffhanger)}”`;
     $("#vote-src").textContent = S.chat?.state === "joined" ? "Chat votes live" : S.chat?.state === "off" ? "Website votes only" : "Chat reconnecting";
     box.innerHTML = poll.options.map((o) => `
       <button class="vote-opt ${t.leader?.key === o.key ? "lead" : ""} ${mine === o.key ? "mine" : ""}" data-key="${o.key}" aria-pressed="${mine === o.key}">

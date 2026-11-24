@@ -59,6 +59,7 @@
   .vote-foot { display:flex; justify-content:space-between; margin-top:10px; font:500 26px Rubik; color:var(--muted); }
   .side.voting .card.story { display:none; }
   .vote-last { animation:in .4s ease both; }
+  .cliff { font-size:21px; font-weight:600; line-height:1.3; margin:6px 0 8px; padding:8px 12px; border-left:4px solid var(--c, #ff3b30); background:rgba(255,255,255,.06); border-radius:6px; }
   .eps { list-style:none; padding:0; margin-top:14px; display:grid; gap:10px; font:500 28px/1.3 Rubik; }
   .eps li { display:flex; gap:16px; } .eps b { font:600 28px 'Chakra Petch'; color:var(--accent); min-width:80px; }
   .eps .muted { color:var(--muted); }
@@ -84,6 +85,7 @@
     </div>
     <div class="card vote" id="vote-card">
       <div class="label"><span class="dot"></span><span id="vote-q">Vote on the next episode</span></div>
+      <div class="cliff" id="vote-cliff"></div>
       <div class="vote-how">Type <b>A</b>, <b>B</b> or <b>C</b> in the chat. One vote per wallet.</div>
       <ol class="vote-opts" id="vote-opts"></ol>
       <div class="vote-foot"><span id="vote-total"></span><span id="vote-last"></span></div>
@@ -156,6 +158,8 @@
     if (!poll) { card.style.display = "none"; return; }
     card.style.display = "";
     $("#vote-q").textContent = poll.question;
+    $("#vote-cliff").style.display = poll.cliffhanger ? "" : "none";
+    $("#vote-cliff").textContent = poll.cliffhanger ? `“${poll.cliffhanger}”` : "";
     const t = poll.tally, max = Math.max(1, ...Object.values(t.counts));
     $("#vote-opts").innerHTML = poll.options.map((o) => `<li class="${t.leader?.key === o.key ? "lead" : ""}"><span class="k">${o.key}</span><div>${esc(o.label)}<div class="bar"><span style="width:${(t.counts[o.key] / max * 100).toFixed(0)}%"></span></div></div><span class="n">${t.counts[o.key]}</span></li>`).join("");
     $("#vote-total").textContent = t.total ? `${t.total} vote${t.total === 1 ? "" : "s"} · ${t.leader.key} is winning` : "No votes yet";

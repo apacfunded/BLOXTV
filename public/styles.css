@@ -256,3 +256,7 @@ input { min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px soli
   .town-row .t-right { grid-column: span 2; text-align: left; display: flex; gap: 14px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* Last episode's cliffhanger, shown above the vote */
+.cliff { margin: 4px 0 10px; padding: 10px 14px; border-left: 4px solid var(--accent, #ff3b30); background: rgba(255,255,255,.05); border-radius: 8px; font-weight: 600; line-height: 1.4; }
+.cliff span { display: block; font-size: 12px; font-weight: 500; opacity: .65; margin-bottom: 2px; }
