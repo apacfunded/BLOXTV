@@ -35,7 +35,7 @@ code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; 
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 700 22px "Chakra Petch", sans-serif; text-transform: uppercase; letter-spacing: .02em; }
 .brand img { width: 36px; height: 36px; border-radius: 10px; object-fit: cover; }
 .nav { display: flex; gap: 2px; margin-left: 8px; }
-.nav a { padding: 8px 12px; border-radius: 10px; text-decoration: none; color: var(--muted); font-weight: 500; font-size: 15px; }
+.nav a { padding: 8px 10px; border-radius: 10px; text-decoration: none; color: var(--muted); font-weight: 500; font-size: 14px; white-space: nowrap; }
 .nav a:hover { color: var(--text); background: var(--surface); }
 .nav a[aria-current="page"] { color: var(--text); background: var(--surface-2); }
 .top-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
