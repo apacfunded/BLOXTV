@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>In My Town Live</title>
+<title>BloxTV Live</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&family=Montserrat:wght@800&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
@@ -74,7 +74,7 @@
 <div class="stage" id="stage">
   <div class="phone" id="phone"><span class="tag" id="tag">NOW PLAYING</span></div>
   <div class="side">
-    <div class="brand"><div class="block" aria-hidden="true"></div><div><h1 id="town">In My Town</h1><div class="ticker" id="ticker"></div></div></div>
+    <div class="brand"><div class="block" aria-hidden="true"></div><div><h1 id="town">BloxTV</h1><div class="ticker" id="ticker"></div></div></div>
     <div class="card" id="status"></div>
     <div class="card">
       <div class="label">Next episode</div>
@@ -172,8 +172,8 @@
   async function refresh() {
     S = await (await fetch("/api/state")).json();
     document.documentElement.style.setProperty("--c", S.coin.color);
-    $("#town").textContent = S.coin.town;
-    $("#ticker").textContent = `$${S.coin.ticker} · live on pump.fun`;
+    $("#town").textContent = S.coin.name || "BloxTV";
+    $("#ticker").textContent = `$${S.coin.ticker} · ${S.coin.town} · live on pump.fun`;
     $("#ca").textContent = S.coin.mint ? S.coin.mint.slice(0, 6) + "…" + S.coin.mint.slice(-6) : "";
     renderFund(); renderStatus(); renderEps(); renderVote();
     const newest = S.episodes.find((e) => e.status === "ready");

@@ -37,7 +37,7 @@
     <section class="hero" aria-labelledby="hero-h">
       <div class="wrap">
         <div>
-          <span class="eyebrow"><span class="dot live" aria-hidden="true"></span> Live on pump.fun</span>
+          <span class="eyebrow"><span class="dot live" aria-hidden="true"></span> BloxTV · live on pump.fun</span>
           <h1 id="hero-h">In my town, <em>every coin</em> gets its own show.</h1>
           <p class="lede">Every trade on <strong>$${esc(c.ticker)}</strong> pays a creator fee. The fees buy the next <strong>“In my town…”</strong> episode, you vote on what happens in it, and it premieres live on the pump.fun stream.</p>
           <div class="chips"><span>No launch fee</span><span>Fees pay for every episode</span><span>Viewers vote on the story</span><span class="hot">Premieres live on pump.fun</span></div>
@@ -106,7 +106,7 @@
     </section>
 
     <dl class="stats" aria-label="Totals">
-      <div><dt>Towns</dt><dd id="s-towns">1</dd><small>Live on In My Town</small></div>
+      <div><dt>Towns</dt><dd id="s-towns">1</dd><small>Live on BloxTV</small></div>
       <div><dt>Episodes made</dt><dd id="s-episodes">0</dd><small>Paid for by fees</small></div>
       <div><dt>Fees spent on video</dt><dd id="s-spent">0</dd><small>SOL, all from trading</small></div>
       <div><dt>Votes cast</dt><dd id="s-votes">0</dd><small>pump.fun chat and here</small></div>
@@ -114,7 +114,7 @@
     </dl>
 
     <section class="section card" id="towns" aria-labelledby="towns-h">
-      <div class="section-head"><h2 id="towns-h">Towns on In My Town</h2><span class="muted small">Every town is a coin with its own show</span></div>
+      <div class="section-head"><h2 id="towns-h">Towns on BloxTV</h2><span class="muted small">Every town is a coin with its own show</span></div>
       <ul class="towns">
         <li><a class="town-row" href="#live">
           <img src="/brand/pfp-512.jpg" alt="">
@@ -128,7 +128,7 @@
     <section class="section card" aria-labelledby="split-h">
       <span class="eyebrow">Creator fees</span>
       <h2 id="split-h" style="margin-top:10px">Every trade feeds the show.</h2>
-      <p class="muted" style="max-width:60ch">pump.fun pays creator fees on every trade of $${esc(c.ticker)}. On In My Town those fees are split the moment they land.</p>
+      <p class="muted" style="max-width:60ch">pump.fun pays creator fees on every trade of $${esc(c.ticker)}. On BloxTV those fees are split the moment they land.</p>
       <div class="split" aria-hidden="true"><div class="s1"><b>60%</b>Episode fund</div><div class="s2"><b>20%</b>Creator</div><div class="s3"><b>20%</b>Platform</div></div>
       <div class="split-notes">
         <div><b>60% makes episodes.</b> Each time the fund reaches ${sol(S.fund.cost)}, the next episode is written, rendered and premiered on stream.</div>
@@ -170,7 +170,7 @@
 
     <section class="section card faq" aria-labelledby="faq-h">
       <h2 id="faq-h">Questions</h2>
-      <details><summary>Is it still a pump.fun coin?</summary><p>Yes. $${esc(c.ticker)} is a normal pump.fun coin with the normal bonding curve and trading. In My Town only reads the creator fees and makes the show.</p></details>
+      <details><summary>Is it still a pump.fun coin?</summary><p>Yes. $${esc(c.ticker)} is a normal pump.fun coin with the normal bonding curve and trading. BloxTV only reads the creator fees and makes the show.</p></details>
       <details><summary>Who writes the episodes?</summary><p>The viewers pick the premise by vote. A writer model turns it into a 7-scene script in the show's voice, and the clips, narration and captions are generated and edited automatically. The cast and the town stay the same every episode.</p></details>
       <details><summary>How do I vote?</summary><p>Type A, B or C in the pump.fun livestream chat, or tap an option on this page. Each wallet gets one vote, and a new vote replaces the old one.</p></details>
       <details><summary>Where does an episode premiere?</summary><p>On the coin's pump.fun livestream, the moment it's rendered. It's also added here, where you can download it to post.</p></details>

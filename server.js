@@ -131,7 +131,7 @@ http.createServer(async (req, res) => {
     send(500, { error: "Something broke on our side. Try again." });
   }
 }).listen(PORT, () => {
-  console.log(`In My Town ($${COIN.ticker}) → http://localhost:${PORT}`);
+  console.log(`${COIN.name} ($${COIN.ticker}) → http://localhost:${PORT}`);
   console.log(`Stream overlay for OBS → http://localhost:${PORT}/stream`);
   console.log(`Video: ${provider()}${DEV ? " · dev tools ON" : ""}`);
 });
