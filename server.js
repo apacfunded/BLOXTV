@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { COIN } from "./lib/config.js";
 import { load, getDb } from "./lib/store.js";
-import { state, addFees, subscribe, completeEpisode, maybeProduce, renderProgress, setViewers, onChatMessage, siteVote, setChatStatus, startTestEpisode, clearPreviewEpisodes, resetShow, importEpisode } from "./lib/show.js";
+import { state, addFees, subscribe, completeEpisode, maybeProduce, renderProgress, setViewers, onChatMessage, siteVote, setChatStatus, startTestEpisode, clearPreviewEpisodes, resetShow, importEpisode, holdFrom, startRelease, stopRelease, releaseStatus, tickRelease } from "./lib/show.js";
 import { ensurePoll } from "./lib/votes.js";
 import { startPumpChat } from "./lib/pumpchat.js";
 import { episodeFile } from "./lib/assemble.js";
@@ -36,6 +36,7 @@ if (DEV && process.env.DEV_SIM_FEES === "1") setInterval(() => {
   addFees(+(n * (0.002 + Math.random() * 0.01)).toFixed(4), { source: "simulated trades", txCount: n });
 }, 4000);
 maybeProduce();
+setInterval(tickRelease, 5_000); // the release clock (survives restarts: it's stored in the db)
 
 // Server-sent events so the site and the stream overlay update live.
 const clients = new Set();
@@ -59,6 +60,14 @@ const routes = [
     const ip = req.socket.remoteAddress || "";
     if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(ip)) return [403, { error: "Admin routes only work from inside the server." }];
     const r = clearPreviewEpisodes();
+    return r.error ? [409, r] : r;
+  }],
+  // Admin: release schedule. Localhost only.
+  ["POST", /^\/api\/admin\/release$/, (_, body, req) => {
+    const ip = req.socket.remoteAddress || "";
+    if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(ip)) return [403, { error: "Admin routes only work from inside the server." }];
+    const a = body.action;
+    const r = a === "hold" ? holdFrom(Number(body.from)) : a === "start" ? startRelease(body.every ?? 5, body.firstNow !== false) : a === "stop" ? stopRelease() : releaseStatus();
     return r.error ? [409, r] : r;
   }],
   // Admin: import an episode made elsewhere (clips as URLs). Localhost only.
@@ -148,7 +157,8 @@ http.createServer(async (req, res) => {
     }
     const epm = url.pathname.match(/^\/episodes\/([\w-]+)\.mp4$/);
     if (epm) {
-      const f = episodeFile(epm[1]);
+      const hidden = getDb().episodes.find((e) => e.id === epm[1] && e.status === "scheduled");
+      const f = hidden ? null : episodeFile(epm[1]);
       if (!f) return send(404, "Not found", "text/plain");
       const stat = fs.statSync(f), range = req.headers.range?.match(/bytes=(\d+)-(\d*)/);
       const start = range ? Number(range[1]) : 0, end = range && range[2] ? Number(range[2]) : stat.size - 1;

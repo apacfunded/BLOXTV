@@ -51,6 +51,14 @@ Before launch, with nothing rendering:
    docker compose exec web node -e 'fetch("http://localhost:3000/api/admin/reset",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({confirm:"RESET"})}).then(r=>r.json()).then(console.log)'
    ```
 
+Pre-made episodes (optional): load them hidden and release one every few minutes after launch.
+   ```bash
+   docker compose exec web node tools/import.mjs episodes/part5.json --hold   # loads it, hidden
+   docker compose exec web node tools/release.mjs hold 2                      # hide episodes 2+ again until launch
+   docker compose exec web node tools/release.mjs status
+   ```
+   At launch: `docker compose exec web node tools/release.mjs start 5` releases one now and one every 5 minutes; each premieres on the stream and opens its vote. The server makes new episodes only after the queue is empty.
+
 Launch:
 
 3. **Create the coin on pump.fun.** Copy the coin's mint address (from the coin page URL) and the wallet you created it with.
