@@ -244,6 +244,10 @@ main { outline: none; padding-bottom: 48px; }
 .launch .row { display: flex; gap: 8px; flex-wrap: wrap; }
 .soon { display: inline-block; padding: 4px 10px; border-radius: 999px; background: rgba(255, 210, 63, .14); color: var(--yellow); font: 700 12px "Chakra Petch", sans-serif; text-transform: uppercase; letter-spacing: .08em; }
 
+.launch-form { display: grid; gap: 10px; margin: 14px 0; }
+.launch-form label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+.launch-form input { min-height: 44px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--bg); color: var(--text); font: inherit; opacity: .6; }
+.row-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 .foot { border-top: 1px solid var(--line); padding: 26px 0 40px; color: var(--muted); font-size: 14px; }
 .foot .wrap { display: grid; gap: 8px; text-align: center; }
 .foot-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 16px; }

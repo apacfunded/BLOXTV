@@ -65,7 +65,7 @@
   const stageWord = (stage, n) => [`Episode ${n} is being funded`, `Episode ${n} is being written`, `Episode ${n} is rendering`, `Episode ${n} just premiered`][stage];
 
   // ---------- Router: every section is its own page
-  const PAGES = { "/": home, "/live": live, "/vote": vote, "/episodes": episodes, "/towns": towns, "/how": how };
+  const PAGES = { "/": home, "/live": live, "/vote": vote, "/episodes": episodes, "/towns": towns, "/how": how, "/launch": launch };
   let page = null, pageKey = null, tv = null, tvId = null;
   function route() {
     let path = location.pathname.replace(/\/+$/, "") || "/";
@@ -198,7 +198,7 @@
         <span class="soon">Coming next</span>
         <h2>Launch your own town</h2>
         <p>After $${esc(c().ticker)}, any coin can get its own show. Same deal: no launch fee, fees pay for the episodes, viewers vote on the story.</p>
-        <button class="btn btn-lg" type="button" data-launch>Launch a town</button>
+        <a class="btn btn-lg" href="/launch" data-link>How launching works</a>
       </div>
     </section>`;
   home.update = () => {
@@ -480,7 +480,7 @@
         <span class="soon">Coming next</span>
         <h2>Your town could be next</h2>
         <p>Launching other towns opens after $${esc(c().ticker)}. No launch fee. Fees pay for the episodes. Viewers vote on the story.</p>
-        <button class="btn btn-lg" type="button" data-launch>Launch a town</button>
+        <a class="btn btn-lg" href="/launch" data-link>How launching works</a>
       </div>
     </section>`;
   towns.update = () => {
@@ -520,6 +520,41 @@
     </section>`;
   how.update = () => {};
 
+  // ---------- Page: Launch (how launching a town will work; opens after the first coin)
+  function launch() {}
+  launch.html = () => `
+    <section class="page wrap">
+      <div class="page-head"><span class="soon">Opens after $${esc(c().ticker)}</span><h1>Launch a town</h1><p>Every coin on BloxTV gets its own narrator, its own town and its own 24/7 show, paid for by its trading fees. Here's the deal.</p></div>
+      <div class="home-grid">
+        <div class="tile"><span class="k">1 · Launch</span><h3>No launch fee</h3><p>You pay pump.fun's normal costs and nothing else. Give your town a name and three facts.</p></div>
+        <div class="tile"><span class="k">2 · Fees</span><h3>Trades pay for the show</h3><p>60% of every creator fee goes into your town's episode fund. 20% is yours. 20% runs the platform.</p></div>
+        <div class="tile"><span class="k">3 · Show</span><h3>Episodes make themselves</h3><p>At ${sol(S.fund.cost)} the next episode is written, voiced and rendered, then premieres on your stream.</p></div>
+      </div>
+      <div class="cols section">
+        <section class="card"><h2>What your town gets</h2><ol class="steps">
+          <li><b>A narrator and a cast</b> in the same blocky style as ${esc(c().town)}, designed from your three facts.</li>
+          <li><b>A story that never stops.</b> Every episode ends on a cliffhanger with three ways it could go. Your holders vote in the pump.fun chat.</li>
+          <li><b>A 24/7 livestream</b> with the vote, the fee bar and every episode, plus a page on BloxTV.</li>
+          <li><b>A season every 10 episodes</b>, replayed in full on the stream when it ends.</li>
+        </ol></section>
+        <section class="card"><h2>What launching will look like</h2>
+          <div class="launch-form" aria-hidden="true">
+            <label>Town name<input value="Emberfall" readonly></label>
+            <label>What's strange about it<input value="The volcano hums a different song every night" readonly></label>
+            <label>Who lives there<input value="Lizards who run the bakery and never blink" readonly></label>
+          </div>
+          <div class="row-btns"><button class="btn btn-accent" disabled>Launch · not yet</button>${c().links?.x ? `<a class="btn" href="${esc(c().links.x)}" target="_blank" rel="noopener">Follow on X for the opening</a>` : ""}</div>
+        </section>
+      </div>
+      <section class="card section faq"><h2>Questions</h2>
+        <details><summary>When does launching open?</summary><p>After $${esc(c().ticker)} has run its first episodes. The opening is announced on X first.</p></details>
+        <details><summary>Does my coin stay a normal pump.fun coin?</summary><p>Yes. Normal bonding curve, normal trading. BloxTV only reads the creator fees and makes the show.</p></details>
+        <details><summary>What if nobody trades?</summary><p>Then the fund fills slowly and episodes come slowly. Nothing is charged to you; the show only costs what the fees pay for.</p></details>
+        <details><summary>Can I choose the story?</summary><p>You set the town and its facts. From there your holders vote on every cliffhanger, like they do for ${esc(c().town)}.</p></details>
+      </section>
+    </section>`;
+  launch.update = () => {};
+
   // ---------- Launch teaser (doesn't launch anything yet)
   function openLaunch() {
     const d = document.createElement("dialog");
@@ -538,7 +573,7 @@
     d.addEventListener("cancel", (e) => { e.preventDefault(); close(); });
     d.showModal();
   }
-  document.addEventListener("click", (e) => { if (e.target.closest("[data-launch], #launch-btn")) openLaunch(); });
+  document.addEventListener("click", (e) => { if (e.target.closest("[data-launch]")) openLaunch(); });
 
   // ---------- Header + data
   const setViewers = (n) => { $("#viewers").innerHTML = `<b>${n}</b><span class="vw"> watching</span>`; };
