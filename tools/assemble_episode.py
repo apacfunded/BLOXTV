@@ -53,7 +53,7 @@ def main():
             "-filter_complex",
             f"[0:v]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS},"
             f"tpad=stop_mode=clone:stop_duration={dur},trim=duration={dur},setpts=PTS-STARTPTS[v];" + audio,
-            "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "medium", "-crf", "18",
+            "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", os.environ.get("ASSEMBLE_PRESET", "veryfast"), "-crf", "20",
             "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k", "-ar", "44100", "-ac", "2", part], check=True)
         parts.append(part)
 
@@ -101,11 +101,11 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", joined, "-stream_loop", "-1", "-i", music, "-filter_complex",
                         f"[1:a]volume={spec_all.get('music_db', -14)}dB,atrim=duration={t0:.2f},afade=t=in:st=0:d=0.5,afade=t=out:st={max(0, t0-1.5):.2f}:d=1.5[m];"
                         f"[0:a][m]amix=inputs=2:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11[a]",
-                        "-map", "0:v", "-map", "[a]", "-vf", vf, "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p",
+                        "-map", "0:v", "-map", "[a]", "-vf", vf, "-c:v", "libx264", "-preset", os.environ.get("ASSEMBLE_PRESET", "veryfast"), "-crf", "20", "-pix_fmt", "yuv420p",
                         "-c:a", "aac", "-b:a", "192k", "-ar", "44100", "-shortest", "-movflags", "+faststart", out], check=True)
     else:
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", joined, "-vf", vf, "-c:v", "libx264", "-preset", "medium",
-                        "-crf", "18", "-pix_fmt", "yuv420p", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k",
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", joined, "-vf", vf, "-c:v", "libx264", "-preset", os.environ.get("ASSEMBLE_PRESET", "veryfast"),
+                        "-crf", "20", "-pix_fmt", "yuv420p", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k",
                         "-ar", "44100", "-movflags", "+faststart", out], check=True)
     print(f"wrote {out} ({t0:.1f}s, {len(events)} caption words)")
 
