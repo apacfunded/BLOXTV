@@ -25,7 +25,7 @@ for i in $(seq 1 20); do pactl info >/dev/null 2>&1 && break; sleep 0.5; done
 pactl load-module module-null-sink sink_name=stream sink_properties=device.description=stream >/dev/null 2>&1 || true
 pactl set-default-sink stream >/dev/null 2>&1 || true
 if pactl list short sinks 2>/dev/null | grep -q "stream"; then
-  AUDIO_IN=(-f pulse -thread_queue_size 2048 -i stream.monitor)
+  AUDIO_IN=(-f pulse -i stream.monitor)
   log "audio: PulseAudio sink ready"
 else
   AUDIO_IN=(-f lavfi -i anullsrc=r=44100:cl=stereo)
@@ -40,7 +40,7 @@ browser() {
 }
 encoder() {
   ffmpeg -hide_banner -loglevel warning \
-    -probesize 20M -f x11grab -framerate "$FPS" -video_size "${W}x${H}" -draw_mouse 0 -thread_queue_size 1024 -i :99 \
+    -probesize 20M -f x11grab -framerate "$FPS" -video_size "${W}x${H}" -draw_mouse 0 -i :99 \
     "${AUDIO_IN[@]}" \
     -c:v libx264 -preset "${PRESET:-ultrafast}" -tune zerolatency -threads 0 -pix_fmt yuv420p -g "$((FPS * 2))" -keyint_min "$FPS" \
     -b:v "${VIDEO_BITRATE:-4500k}" -maxrate "${VIDEO_BITRATE:-4500k}" -bufsize "$((2 * ${VIDEO_BITRATE%k}))k" \
@@ -62,7 +62,7 @@ fi
 # WHIP wants H.264 baseline without B-frames and 48 kHz stereo Opus; the key travels as a Bearer token.
 whip_encoder() {
   ffmpeg -hide_banner -loglevel warning \
-    -probesize 20M -f x11grab -framerate "$FPS" -video_size "${W}x${H}" -draw_mouse 0 -thread_queue_size 1024 -i :99 \
+    -probesize 20M -f x11grab -framerate "$FPS" -video_size "${W}x${H}" -draw_mouse 0 -i :99 \
     "${AUDIO_IN[@]}" \
     -c:v libx264 -preset "${PRESET:-ultrafast}" -tune zerolatency -profile:v baseline -bf 0 -threads 0 -pix_fmt yuv420p \
     -g "$((FPS * 2))" -keyint_min "$FPS" \
