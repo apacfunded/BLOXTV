@@ -6,6 +6,7 @@ import { load, getDb } from "./lib/store.js";
 import { state, addFees, subscribe, completeEpisode, maybeProduce, renderProgress, setViewers, onChatMessage, siteVote, setChatStatus } from "./lib/show.js";
 import { ensurePoll } from "./lib/votes.js";
 import { startPumpChat } from "./lib/pumpchat.js";
+import { episodeFile } from "./lib/assemble.js";
 import { startFeeWatcher, watchedAddresses } from "./lib/fees.js";
 import { provider } from "./lib/video.js";
 
@@ -110,6 +111,15 @@ http.createServer(async (req, res) => {
         }
       }
       return send(404, { error: "Not found." });
+    }
+    const epm = url.pathname.match(/^\/episodes\/([\w-]+)\.mp4$/);
+    if (epm) {
+      const f = episodeFile(epm[1]);
+      if (!f) return send(404, "Not found", "text/plain");
+      const stat = fs.statSync(f), range = req.headers.range?.match(/bytes=(\d+)-(\d*)/);
+      const start = range ? Number(range[1]) : 0, end = range && range[2] ? Number(range[2]) : stat.size - 1;
+      res.writeHead(range ? 206 : 200, { "content-type": "video/mp4", "accept-ranges": "bytes", "content-length": end - start + 1, ...(range ? { "content-range": `bytes ${start}-${end}/${stat.size}` } : {}) });
+      return fs.createReadStream(f, { start, end }).pipe(res);
     }
     const pathname = url.pathname === "/stream" ? "/stream.html" : url.pathname;
     let file = path.join(PUBLIC, path.normalize(pathname));

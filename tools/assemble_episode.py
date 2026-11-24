@@ -39,18 +39,20 @@ def main():
     parts, events, t0 = [], [], 0.0
 
     for n, s in enumerate(scenes):
-        clip, vo = os.path.join(base, s["clip"]), os.path.join(base, s["vo"])
-        vo_d = probe(vo)
+        clip = os.path.join(base, s["clip"])
+        vo = os.path.join(base, s["vo"]) if s.get("vo") else None
+        vo_d = probe(vo) if vo else max(2.0, len(s["line"].split()) * 0.38 + 0.8)  # no narration: time captions to the words
         dur = max(vo_d + PAD_BEFORE + PAD_AFTER, 2.5)
         part = os.path.join(tmp, f"p{n}.mp4")
+        inputs = ["-i", clip] + (["-i", vo] if vo else [])
+        audio = (f"[0:a]volume=0.35,apad,atrim=duration={dur}[amb];"
+                 f"[1:a]adelay={int(PAD_BEFORE*1000)}|{int(PAD_BEFORE*1000)},volume=1.6,apad,atrim=duration={dur}[vo];"
+                 f"[amb][vo]amix=inputs=2:normalize=0,aresample=44100[a]") if vo else f"[0:a]volume=0.6,apad,atrim=duration={dur},aresample=44100[a]"
         subprocess.run([
-            "ffmpeg", "-v", "error", "-y", "-i", clip, "-i", vo,
+            "ffmpeg", "-v", "error", "-y", *inputs,
             "-filter_complex",
             f"[0:v]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS},"
-            f"tpad=stop_mode=clone:stop_duration={dur},trim=duration={dur},setpts=PTS-STARTPTS[v];"
-            f"[0:a]volume=0.35,apad,atrim=duration={dur}[amb];"
-            f"[1:a]adelay={int(PAD_BEFORE*1000)}|{int(PAD_BEFORE*1000)},volume=1.6,apad,atrim=duration={dur}[vo];"
-            f"[amb][vo]amix=inputs=2:normalize=0,aresample=44100[a]",
+            f"tpad=stop_mode=clone:stop_duration={dur},trim=duration={dur},setpts=PTS-STARTPTS[v];" + audio,
             "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "medium", "-crf", "18",
             "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k", "-ar", "44100", "-ac", "2", part], check=True)
         parts.append(part)
@@ -91,9 +93,20 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     fontsdir = os.path.dirname(os.path.abspath(font)) if font else None
     vf = f"ass={ass}" + (f":fontsdir={fontsdir}" if fontsdir else "")
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", joined, "-vf", vf, "-c:v", "libx264", "-preset", "medium",
-                    "-crf", "18", "-pix_fmt", "yuv420p", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k",
-                    "-ar", "44100", "-movflags", "+faststart", out], check=True)
+    spec_all = json.load(open(spec))
+    music = spec_all.get("music")
+    if music and not os.path.isabs(music): music = os.path.join(base, music)
+    if music and os.path.exists(music):
+        # Loop the show's music bed under everything, quiet, fading out at the end.
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", joined, "-stream_loop", "-1", "-i", music, "-filter_complex",
+                        f"[1:a]volume={spec_all.get('music_db', -14)}dB,atrim=duration={t0:.2f},afade=t=in:st=0:d=0.5,afade=t=out:st={max(0, t0-1.5):.2f}:d=1.5[m];"
+                        f"[0:a][m]amix=inputs=2:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11[a]",
+                        "-map", "0:v", "-map", "[a]", "-vf", vf, "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p",
+                        "-c:a", "aac", "-b:a", "192k", "-ar", "44100", "-shortest", "-movflags", "+faststart", out], check=True)
+    else:
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", joined, "-vf", vf, "-c:v", "libx264", "-preset", "medium",
+                        "-crf", "18", "-pix_fmt", "yuv420p", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k",
+                        "-ar", "44100", "-movflags", "+faststart", out], check=True)
     print(f"wrote {out} ({t0:.1f}s, {len(events)} caption words)")
 
 

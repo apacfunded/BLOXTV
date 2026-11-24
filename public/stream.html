@@ -122,7 +122,7 @@
     player?.destroy();
     playing = ep;
     $("#tag").textContent = `${tag} · EP ${ep.number}`;
-    player = ReelPlayer.for($("#phone"), ep, { voice: q.get("voice") === "1", onEnd: () => setTimeout(playNext, 1200) });
+    player = ReelPlayer.for($("#phone"), ep, { voice: q.get("voice") === "1", sound: true, onEnd: () => setTimeout(playNext, 1200) });
     player.play();
     renderStatus();
   }

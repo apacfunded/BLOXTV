@@ -59,6 +59,29 @@ Set `SOLANA_RPC_URL` to a private RPC (Helius, Triton, …). The public endpoint
 
 Set `ANTHROPIC_API_KEY` and each episode script is written by Claude (`claude-opus-5-5`; override with `SCRIPT_MODEL`). It gets the town facts and earlier episode titles, so the story continues. Without a key, a built-in template writes the scripts.
 
+## Running the whole show, 24/7
+
+```
+docker compose up -d
+```
+
+Two containers:
+- **web**: the site, the live board, the fee watcher, the chat vote reader and the episode pipeline.
+- **streamer**: a headless Chromium renders `/stream` at 1920x1080 on a virtual display and ffmpeg pushes it, with sound, to pump.fun over RTMP. It restarts itself if anything dies. No OBS, no PC.
+
+Put your keys in `.env` (copy `.env.example`): Higgsfield, ElevenLabs, Anthropic, a Solana RPC, and the pump.fun RTMP URL and stream key (coin page → Start Livestream → Generate RTMP Credentials). Host it anywhere that runs Docker and stays on: a $10–20/month VPS (Hetzner, DigitalOcean) is enough; the streamer wants about 2 vCPU for 1080p30. The stream needs about 5 Mbit/s up.
+
+The automated episode pipeline, for every funded episode:
+1. The winning vote becomes the premise; Claude writes the 7-scene script (template fallback).
+2. For each scene, Higgsfield makes one keyframe (GPT Image Sunburst, with the cast sheet and reference thumbnail attached) and one clip (Seedance 2.5 reference-to-video from that keyframe), four scenes at a time.
+3. ElevenLabs narrates each line in the show's voice.
+4. ffmpeg assembles clips, narration, one-word captions and the music loop into `data/episodes/<id>/episode.mp4`, served at `/episodes/<id>.mp4`.
+5. The stream premieres it with sound, the site adds it with a download button, and the next vote opens.
+
+At 480p, an episode costs about 7 × (2 image + 12 video) ≈ 100 Higgsfield credits plus a few cents of ElevenLabs. If a render fails the episode airs as the built-in preview reel and nothing is retried.
+
+**The narrator voice in ElevenLabs:** the show's voice was cloned from `reference/reference-clip.mp4`. Make the same clone in your ElevenLabs account (Voices → Add → Instant Voice Clone, upload the clip's voice track, name it "In My Town narrator") and put its voice ID in `ELEVENLABS_VOICE_ID`. Until then episodes have captions and music but no narration.
+
 ## Going live on pump.fun
 
 1. Open your coin on pump.fun → **Start Livestream** → **Generate RTMP Credentials**. That gives you an RTMP URL and a stream key. Keep the key private.
@@ -72,22 +95,17 @@ If you need the stream running 24/7, run OBS on a cloud VM.
 
 ## Higgsfield (real AI video)
 
-```bash
-VIDEO_PROVIDER=higgsfield HF_API_KEY_ID=... HF_API_KEY_SECRET=... npm start
-```
-
-Get the key pair at console.higgsfield.ai. The API is billed separately from the app subscription, so add a balance there. For each funded episode, every scene becomes one 9:16 text-to-video clip, and all clips are generated in parallel. The site shows render progress live as clips finish. The stream and site play the clips back to back with the captions on top.
+Set `VIDEO_PROVIDER=higgsfield` with `HF_API_KEY_ID` and `HF_API_KEY_SECRET` from console.higgsfield.ai (the API is billed separately from the app subscription). `lib/higgsfield.js` follows the documented API: `Authorization: Key id:secret`, submit then poll `status_url`, uploads through `/files/generate-upload-url`.
 
 | Env | Default | |
 |---|---|---|
-| `HF_MODEL_PATH` | `bytedance/seedance-2.0/text-to-video` | Model endpoint path |
-| `HF_DURATION` | `5` | Seconds per scene clip |
-| `HF_EXTRA_BODY` | none | JSON merged into each request, e.g. `{"resolution":"720p"}` |
-| `HF_BASE_URL` | `https://api.higgsfield.ai` | |
+| `HF_IMAGE_MODEL` | `marketing-studio/image/sunburst` | Keyframes, with reference images |
+| `HF_VIDEO_MODEL` | `bytedance/seedance-2.5/reference-to-video` | Clips from keyframe + cast sheet |
+| `HF_RESOLUTION` | `480p` | `480p` ≈ 3 credits/s, `720p` ≈ 7, `1080p` ≈ 16 |
+| `HF_DURATION` | per line | Seconds per clip (4–30) |
+| `HF_PARALLEL` | `4` | Scenes generated at once |
 
-**Before the first paid run, check `lib/higgsfield.js` against docs.higgsfield.ai.** It follows Higgsfield's published example (`POST /<model>`, `Authorization: Key id:secret`, then poll the request). The status and result fields are read defensively, but not against the live API. Set `episodeCostSol` so that one episode's fees cover about 7 clips.
-
-If a render fails, the episode still airs as a preview reel, and it isn't retried, so a failure doesn't keep spending credits.
+Tested end to end against a stand-in of the documented API, not against the live service yet; the first real episode is the live test.
 
 ## Video quality: preview vs. real renders
 

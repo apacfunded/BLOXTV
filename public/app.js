@@ -424,6 +424,7 @@
     if (ep.videoUrl) {
       $(".player-stage", d).innerHTML = `<video src="${esc(ep.videoUrl)}" controls autoplay playsinline class="reel-canvas"></video>`;
       d.querySelectorAll("[data-act=play],[data-act=voice],[data-act=rec]").forEach((b) => b.remove());
+      d.querySelector(".player-bar").insertAdjacentHTML("afterbegin", `<a class="btn" href="${esc(ep.videoUrl)}" download="in-my-town-ep${ep.number}.mp4">Download video</a>`);
     } else {
       if (ep.clips?.length) $("[data-act=rec]", d).remove();
       p = ReelPlayer.for($(".player-stage", d), { ...ep, coin: S.coin }, { onState: (on) => (playBtn.textContent = on ? "Pause" : "Play"), onEnd: () => (playBtn.textContent = "Replay") });

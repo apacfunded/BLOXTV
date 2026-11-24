@@ -314,8 +314,24 @@
     destroy() { this.pause(); this.video.removeAttribute("src"); this.canvas.remove(); }
     async record() { throw new Error("This episode is already a real video. Save the clips from the script panel."); }
   }
+  // FilePlayer: a finished episode file (narration, captions and music already in it).
+  class FilePlayer {
+    constructor(container, ep, opts = {}) {
+      this.ep = ep; this.opts = opts; this.playing = false;
+      this.canvas = document.createElement("div"); this.canvas.className = "reel-canvas clip-player";
+      this.canvas.innerHTML = `<video playsinline preload="auto" ${opts.sound ? "" : "muted"}></video>`;
+      this.video = this.canvas.querySelector("video"); this.video.src = ep.videoUrl;
+      this.video.addEventListener("ended", () => { this.playing = false; this.opts.onState?.(false); this.opts.onEnd?.(); });
+      container.appendChild(this.canvas);
+    }
+    play() { this.playing = true; this.video.play().catch(() => { this.video.muted = true; this.video.play().catch(() => {}); }); this.opts.onState?.(true); }
+    pause() { this.playing = false; this.video.pause(); this.opts.onState?.(false); }
+    toggle() { this.playing ? this.pause() : this.play(); }
+    destroy() { this.pause(); this.video.removeAttribute("src"); this.canvas.remove(); }
+    async record() { throw new Error("This episode is already a finished video."); }
+  }
   // Pick the right player for an episode.
-  ReelPlayer.for = (container, ep, opts) => (ep.clips?.length ? new ClipPlayer(container, ep, opts) : new ReelPlayer(container, ep, opts));
+  ReelPlayer.for = (container, ep, opts) => ep.videoUrl ? new FilePlayer(container, ep, opts) : ep.clips?.length ? new ClipPlayer(container, ep, opts) : new ReelPlayer(container, ep, opts);
 
   // A still frame of one scene, for storyboards.
   ReelPlayer.still = (container, ep, index) => {

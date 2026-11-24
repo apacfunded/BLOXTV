@@ -1,0 +1,24 @@
+# One command runs the whole show: `docker compose up -d`
+#   web       the site, the live board, the fee watcher, the chat votes and the episode pipeline
+#   streamer  renders /stream and pushes it to pump.fun over RTMP, 24/7
+# Put secrets in a .env file next to this (see .env.example).
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    ports: ["3000:3000"]
+    env_file: .env
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
+      VIDEO_PROVIDER: ${VIDEO_PROVIDER:-higgsfield}
+    volumes:
+      - ./data:/app/data
+      - ./coin.config.json:/app/coin.config.json:ro
+  streamer:
+    build: ./stream
+    restart: unless-stopped
+    depends_on: [web]
+    env_file: .env
+    environment:
+      SITE_URL: http://web:3000
+    shm_size: "1gb"
