@@ -261,7 +261,7 @@
       if (ep.status === "rendering") {
         const rp = ep.renderProgress || 0;
         $("#render-bar").style.width = (rp * 100).toFixed(1) + "%";
-        $("#render-pct").textContent = rp ? Math.round(rp * 100) + "%" : "Starting";
+        $("#render-pct").textContent = (rp ? Math.round(rp * 100) + "%" : "Starting") + (ep.renderNote ? " · " + ep.renderNote : "");
       }
     }
 
