@@ -3,7 +3,7 @@
 FROM debian:bookworm-slim
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      chromium xvfb pulseaudio ffmpeg fonts-liberation fonts-noto-color-emoji ca-certificates curl procps \
+      chromium xvfb pulseaudio ffmpeg fonts-liberation fonts-noto-color-emoji ca-certificates curl procps xz-utils \
     && rm -rf /var/lib/apt/lists/*
 # pump.fun's "stream with external software" hands out a WHIP (WebRTC) address, which needs ffmpeg 8+.
 # Debian's ffmpeg is too old for that, so a current static build goes in front of it on the PATH.
