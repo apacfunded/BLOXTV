@@ -16,5 +16,5 @@
   "pollSeconds": 20,
   "seasonLength": 10,
   "trailer": "/brand/trailer.mp4",
-  "links": { "x": "", "telegram": "" }
+  "links": { "x": "https://x.com/BloxTV_Sol", "telegram": "" }
 }

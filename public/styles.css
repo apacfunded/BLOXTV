@@ -47,6 +47,7 @@ code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; 
 .btn:active { transform: translateY(1px); }
 .btn-accent { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .btn-accent:hover { background: #c92a3e; border-color: #c92a3e; }
+.btn-icon { width: 44px; padding: 0; }
 .btn-lg { min-height: 54px; padding: 0 28px; font-size: 16px; }
 .btn[aria-disabled="true"], .btn:disabled { opacity: .5; pointer-events: none; }
 

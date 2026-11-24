@@ -546,6 +546,7 @@
     $("#brand-name").textContent = c().name;
     const buy = $("#buy"); buy.textContent = `Buy $${c().ticker}`;
     if (c().pumpUrl) buy.href = c().pumpUrl; else buy.setAttribute("aria-disabled", "true");
+    for (const id of ["x-link", "x-foot"]) { const a = $("#" + id); if (c().links?.x) { a.href = c().links.x; a.hidden = false; } }
     document.documentElement.style.setProperty("--c", c().color);
   }
   async function refresh() {
