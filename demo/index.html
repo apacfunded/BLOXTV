@@ -1,0 +1,40 @@
+<title>In My Town</title>
+<meta name="description" content="Every coin gets its own show. Fees pay for each 'In my town…' episode, viewers vote on what happens next, and it premieres live on pump.fun.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Montserrat:wght@800&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>.demo-bar{background:#fff;color:#0b0f17;font-size:14px;font-weight:500;text-align:center;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))} .top{top:env(safe-area-inset-top,0px)} [data-act="rec"]{display:none}</style>
+<div class="demo-bar" role="note">Preview: trades, fees and votes here are simulated. The live site reads real creator fees and the pump.fun chat.</div>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="In My Town home"><img src="brand/pfp-512.jpg" alt=""><span id="brand-name">In My Town</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="#live">Live</a>
+      <a href="#vote">Vote</a>
+      <a href="#episodes">Episodes</a>
+      <a href="#towns">Towns</a>
+      <a href="#how">How it works</a>
+    </nav>
+    <div class="top-right">
+      <span class="pill" id="conn" hidden>Reconnecting…</span>
+      <span class="pill"><span class="dot live" aria-hidden="true"></span><span id="viewers">Live</span></span>
+      <a class="btn btn-primary" id="buy" href="#" target="_blank" rel="noopener">Buy</a>
+    </div>
+  </div>
+</header>
+
+<main id="app" tabindex="-1"><div class="wrap"><div class="loading" aria-busy="true" style="height:60vh"></div></div></main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>In My Town · every coin gets its own show · launches on pump.fun</span>
+    <span>Not financial advice. Memecoins can go to zero. Episodes are fan-made in a blocky game style and aren't affiliated with any game platform.</span>
+  </div>
+</footer>
+
+<div class="toast" role="status" aria-live="polite" id="toast"></div>
+<script src="demo.js"></script>
+<script src="reel.js"></script>
+<script src="app.js"></script>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>In My Town</title>
+<meta name="description" content="Every coin gets its own show. Trading fees pay for each 'In my town…' episode, viewers vote on what happens next, and it premieres live on pump.fun.">
+<meta property="og:title" content="In My Town">
+<meta property="og:description" content="Every coin gets its own show. Fees pay for the episodes. Viewers vote on the story.">
+<meta property="og:image" content="/brand/pfp.jpg">
+<link rel="icon" href="/brand/pfp-512.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Montserrat:wght@800&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="In My Town home"><img src="/brand/pfp-512.jpg" alt=""><span id="brand-name">In My Town</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="#live">Live</a>
+      <a href="#vote">Vote</a>
+      <a href="#episodes">Episodes</a>
+      <a href="#towns">Towns</a>
+      <a href="#how">How it works</a>
+    </nav>
+    <div class="top-right">
+      <span class="pill" id="conn" hidden>Reconnecting…</span>
+      <span class="pill"><span class="dot live" aria-hidden="true"></span><span id="viewers">Live</span></span>
+      <a class="btn btn-primary" id="buy" href="#" target="_blank" rel="noopener">Buy</a>
+    </div>
+  </div>
+</header>
+
+<main id="app" tabindex="-1"><div class="wrap"><div class="loading" aria-busy="true" style="height:60vh"></div></div></main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>In My Town · every coin gets its own show · launches on pump.fun</span>
+    <span>Not financial advice. Memecoins can go to zero. Episodes are fan-made in a blocky game style and aren't affiliated with any game platform.</span>
+  </div>
+</footer>
+
+<div class="toast" role="status" aria-live="polite" id="toast"></div>
+<script src="/reel.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

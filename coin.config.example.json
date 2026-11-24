@@ -1,0 +1,18 @@
+{
+  "name": "In My Town",
+  "ticker": "TOWN",
+  "mint": "",
+  "creatorWallet": "",
+  "town": "Puddleton",
+  "color": "#2563eb",
+  "facts": {
+    "weird": "It has rained for 400 years and everyone owns a boat instead of a car",
+    "who": "Ducks run the post office and they are strict",
+    "night": "The puddles glow and you can see another town underneath"
+  },
+  "episodeCostSol": 0.5,
+  "countExistingFees": false,
+  "feeVaults": [],
+  "pollSeconds": 20,
+  "links": { "x": "", "telegram": "" }
+}

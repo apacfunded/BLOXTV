@@ -1,0 +1,7 @@
+node_modules/
+data/
+coin.config.json
+.env
+pilot/
+ads/build/
+*.zip

@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>In My Town Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&family=Montserrat:wght@800&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Broadcast scene for OBS. Fixed 1920x1080 stage (or 1080x1920 with ?layout=portrait), scaled to fit. */
+  :root { --bg:#eef3f8; --surface:#fff; --text:#0c1626; --muted:#4b5b73; --accent:#2563eb; --line:#d4deea; --live:#e11d48; --c:#2563eb; }
+  * { box-sizing:border-box; margin:0; }
+  html, body { height:100%; background:#0c1626; overflow:hidden; font-family:Rubik, system-ui, sans-serif; color:var(--text); }
+  .stage { position:absolute; top:0; left:0; width:1920px; height:1080px; transform-origin:0 0; background:var(--bg);
+    background-image:linear-gradient(var(--line) 2px, transparent 2px), linear-gradient(90deg, var(--line) 2px, transparent 2px); background-size:64px 64px;
+    display:grid; grid-template-columns:600px 1fr; gap:56px; padding:50px 72px; }
+  .portrait .stage { width:1080px; height:1920px; grid-template-columns:1fr; grid-template-rows:1060px 1fr; gap:36px; padding:48px; justify-items:center; }
+  .phone { width:574px; height:980px; border-radius:44px; background:#0c1626; padding:16px; box-shadow:0 24px 60px rgba(12,22,38,.25); position:relative; }
+  .portrait .phone { width:596px; height:1040px; }
+  .phone canvas, .phone .clip-player { width:100%; height:100%; border-radius:30px; display:block; }
+  .clip-player { position:relative; background:#000; overflow:hidden; container-type:inline-size; }
+  .clip-player video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .clip-cap { position:absolute; left:6%; right:6%; top:50%; transform:translateY(-50%); text-align:center; color:#fff; font:800 62px/1.1 Montserrat, Rubik, sans-serif; -webkit-text-stroke:2px #000; paint-order:stroke fill; text-shadow:0 4px 0 #000; }
+  .clip-bars { position:absolute; top:14px; left:14px; right:14px; display:flex; gap:4px; } .clip-bars i { flex:1; height:5px; background:rgba(255,255,255,.35); border-radius:3px; overflow:hidden; } .clip-bars b { display:block; height:100%; width:0; background:#fff; }
+  .tag { position:absolute; top:40px; left:40px; background:var(--live); color:#fff; font:600 26px 'Chakra Petch'; padding:6px 16px; border-radius:8px; letter-spacing:.04em; }
+  .side { display:flex; flex-direction:column; gap:28px; min-width:0; width:100%; }
+  .brand { display:flex; align-items:center; gap:20px; }
+  .block { width:76px; height:76px; background:var(--c); border-radius:10px; box-shadow:inset -10px -10px 0 rgba(0,0,0,.18), inset 8px 8px 0 rgba(255,255,255,.25); }
+  h1 { font:600 72px/1 'Chakra Petch'; letter-spacing:-.01em; }
+  .ticker { font:500 32px Rubik; color:var(--muted); margin-top:6px; }
+  .card { background:var(--surface); border:2px solid var(--line); border-radius:24px; padding:32px 36px; box-shadow:0 6px 20px rgba(12,22,38,.06); }
+  .label { font:600 26px 'Chakra Petch'; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:12px; }
+  .dot { width:16px; height:16px; border-radius:4px; background:var(--live); animation:blink 1.2s steps(2) infinite; }
+  @keyframes blink { 50% { opacity:.2 } }
+  .now { font:600 52px/1.1 'Chakra Petch'; margin-top:12px; }
+  .meter { height:44px; background:#e3ebf5; border-radius:12px; overflow:hidden; margin:18px 0 12px; border:2px solid var(--line); }
+  .meter span { display:block; height:100%; background:var(--accent); transition:width .8s ease; background-image:repeating-linear-gradient(90deg, transparent 0 40px, rgba(255,255,255,.18) 40px 44px); }
+  .fund-row { display:flex; justify-content:space-between; font:500 32px Rubik; }
+  .fund-row strong { font:600 40px 'Chakra Petch'; }
+  .script { list-style:none; padding:0; display:flex; flex-direction:column; gap:10px; margin-top:16px; font:500 30px/1.3 Rubik; }
+  .script li { animation:in .4s ease both; }
+  .script li::before { content:"› "; color:var(--accent); font-weight:600; }
+  .caret { display:inline-block; width:16px; height:30px; background:var(--text); animation:blink 1s steps(2) infinite; vertical-align:middle; }
+  @keyframes in { from { opacity:0; transform:translateY(8px) } }
+  .feed { position:relative; height:70px; }
+  .fee { position:absolute; left:0; font:600 40px 'Chakra Petch'; color:#16a34a; animation:pop 3s ease forwards; }
+  @keyframes pop { 0% { opacity:0; transform:translateY(20px) } 15% { opacity:1; transform:none } 80% { opacity:1 } 100% { opacity:0; transform:translateY(-30px) } }
+  .vote-how { font:500 28px Rubik; color:var(--muted); margin-top:8px; }
+  .vote-how b { color:var(--text); font-weight:600; }
+  .vote-opts { list-style:none; padding:0; margin:12px 0 0; display:grid; gap:8px; }
+  .vote-opts li { display:grid; grid-template-columns:56px 1fr 90px; align-items:center; gap:14px; font:500 28px/1.2 Rubik; }
+  .vote-opts .k { width:56px; height:56px; border-radius:12px; background:var(--accent); color:#fff; display:grid; place-items:center; font:600 32px 'Chakra Petch'; }
+  .vote-opts .bar { height:18px; background:#e3ebf5; border:2px solid var(--line); border-radius:9px; overflow:hidden; margin-top:6px; }
+  .vote-opts .bar span { display:block; height:100%; background:var(--accent); transition:width .6s ease; }
+  .vote-opts li.lead .k { background:#16a34a; }
+  .vote-opts li.lead .bar span { background:#16a34a; }
+  .vote-opts .n { text-align:right; font:600 34px 'Chakra Petch'; }
+  .vote-foot { display:flex; justify-content:space-between; margin-top:10px; font:500 26px Rubik; color:var(--muted); }
+  .side.voting .card.story { display:none; }
+  .vote-last { animation:in .4s ease both; }
+  .eps { list-style:none; padding:0; margin-top:14px; display:grid; gap:10px; font:500 28px/1.3 Rubik; }
+  .eps li { display:flex; gap:16px; } .eps b { font:600 28px 'Chakra Petch'; color:var(--accent); min-width:80px; }
+  .eps .muted { color:var(--muted); }
+  .foot { margin-top:auto; font:500 28px Rubik; color:var(--muted); display:flex; justify-content:space-between; gap:24px; }
+  .foot code { font:500 24px ui-monospace, monospace; color:var(--text); }
+  .premiere { position:absolute; inset:0; display:grid; place-items:center; background:rgba(12,22,38,.86); color:#fff; font:600 140px/1 'Chakra Petch'; text-align:center; opacity:0; pointer-events:none; transition:opacity .4s; }
+  .premiere small { display:block; font:500 44px Rubik; margin-top:20px; color:#c7d2fe; }
+  .premiere.show { opacity:1; }
+  @media (prefers-reduced-motion: reduce) { .dot, .caret, .script li, .fee { animation:none } }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="phone" id="phone"><span class="tag" id="tag">NOW PLAYING</span></div>
+  <div class="side">
+    <div class="brand"><div class="block" aria-hidden="true"></div><div><h1 id="town">In My Town</h1><div class="ticker" id="ticker"></div></div></div>
+    <div class="card" id="status"></div>
+    <div class="card">
+      <div class="label">Next episode</div>
+      <div class="meter"><span id="bar" style="width:0"></span></div>
+      <div class="fund-row"><span id="fund-text"></span><strong id="fund-pct"></strong></div>
+      <div class="feed" id="feed" aria-live="polite"></div>
+    </div>
+    <div class="card vote" id="vote-card">
+      <div class="label"><span class="dot"></span><span id="vote-q">Vote on the next episode</span></div>
+      <div class="vote-how">Type <b>A</b>, <b>B</b> or <b>C</b> in the chat. One vote per wallet.</div>
+      <ol class="vote-opts" id="vote-opts"></ol>
+      <div class="vote-foot"><span id="vote-total"></span><span id="vote-last"></span></div>
+    </div>
+    <div class="card story"><div class="label">The story so far</div><ol class="eps" id="eps"></ol></div>
+    <div class="foot"><span>Every trade buys the next episode.</span><code id="ca"></code></div>
+  </div>
+  <div class="premiere" id="premiere"></div>
+</div>
+<script src="/reel.js"></script>
+<script>
+(() => {
+  const q = new URLSearchParams(location.search);
+  if (q.get("layout") === "portrait") document.body.classList.add("portrait");
+  const stage = document.getElementById("stage");
+  const fit = () => {
+    const w = stage.offsetWidth, h = stage.offsetHeight;
+    const s = Math.min(innerWidth / w, innerHeight / h);
+    stage.style.transform = `translate(${(innerWidth - w * s) / 2}px, ${(innerHeight - h * s) / 2}px) scale(${s})`;
+  };
+  addEventListener("resize", fit); fit();
+
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const sol = (n) => (n >= 1 ? n.toFixed(2) : n.toFixed(3)) + " SOL";
+  let S = null, player = null, playing = null, queue = [], seenReady = null;
+
+  function playNext() {
+    const ready = S.episodes.filter((e) => e.status === "ready");
+    if (!ready.length) { $("#tag").textContent = "COMING SOON"; return; }
+    if (!queue.length) queue = ready.map((e) => e.id); // newest first, then loop
+    const ep = ready.find((e) => e.id === queue.shift()) || ready[0];
+    start(ep, "NOW PLAYING");
+  }
+  function start(ep, tag) {
+    player?.destroy();
+    playing = ep;
+    $("#tag").textContent = `${tag} · EP ${ep.number}`;
+    player = ReelPlayer.for($("#phone"), ep, { voice: q.get("voice") === "1", onEnd: () => setTimeout(playNext, 1200) });
+    player.play();
+    renderStatus();
+  }
+  function premiere(ep) {
+    $("#premiere").innerHTML = `<div>PREMIERE<small>Episode ${ep.number}: ${esc(ep.title)}</small></div>`;
+    $("#premiere").classList.add("show");
+    player?.pause();
+    setTimeout(() => { $("#premiere").classList.remove("show"); queue = []; start(ep, "PREMIERE"); }, 4000);
+  }
+
+  function renderStatus() {
+    const making = S.episodes.find((e) => e.id === S.producing);
+    if (making) {
+      $("#status").innerHTML = `<div class="label"><span class="dot"></span>${making.status === "writing" ? "Writing" : "Rendering"} episode ${making.number}</div>
+        <ul class="script">${making.scenes.slice(-5).map((s) => `<li>${esc(s.line)}</li>`).join("")}${making.status === "writing" ? `<li><span class="caret"></span></li>` : ""}</ul>`;
+    } else if (playing) {
+      $("#status").innerHTML = `<div class="label">Episode ${playing.number}</div><div class="now">${esc(playing.title)}</div>`;
+    } else {
+      $("#status").innerHTML = `<div class="label">Coming soon</div><div class="now">Episode 1 starts filming when the fund is full.</div>`;
+    }
+  }
+  function renderEps() {
+    const ready = S.episodes.filter((e) => e.status === "ready").slice(0, 4);
+    $("#eps").innerHTML = ready.length ? ready.map((e) => `<li><b>EP ${e.number}</b><span>${esc(e.scenes[0]?.line || e.title)}</span></li>`).join("")
+      : `<li class="muted">Episode 1 is waiting on its first ${sol(S.fund.cost)} in fees.</li>`;
+  }
+  function renderVote(poll) {
+    poll = poll || S.poll;
+    const card = $("#vote-card");
+    document.querySelector(".side").classList.toggle("voting", !!poll);
+    if (!poll) { card.style.display = "none"; return; }
+    card.style.display = "";
+    $("#vote-q").textContent = poll.question;
+    const t = poll.tally, max = Math.max(1, ...Object.values(t.counts));
+    $("#vote-opts").innerHTML = poll.options.map((o) => `<li class="${t.leader?.key === o.key ? "lead" : ""}"><span class="k">${o.key}</span><div>${esc(o.label)}<div class="bar"><span style="width:${(t.counts[o.key] / max * 100).toFixed(0)}%"></span></div></div><span class="n">${t.counts[o.key]}</span></li>`).join("");
+    $("#vote-total").textContent = t.total ? `${t.total} vote${t.total === 1 ? "" : "s"} · ${t.leader.key} is winning` : "No votes yet";
+    if (poll.last) $("#vote-last").innerHTML = `<span class="vote-last">${esc(poll.last.name)} voted ${poll.last.key}</span>`;
+  }
+  function renderFund() {
+    const f = S.fund, making = !!S.producing;
+    const p = making ? 1 : f.progress;
+    $("#bar").style.width = (p * 100).toFixed(1) + "%";
+    $("#fund-text").textContent = making ? "Funded. Making it now." : `${sol(f.balance)} of ${sol(f.cost)}`;
+    $("#fund-pct").textContent = Math.round(p * 100) + "%";
+  }
+
+  async function refresh() {
+    S = await (await fetch("/api/state")).json();
+    document.documentElement.style.setProperty("--c", S.coin.color);
+    $("#town").textContent = S.coin.town;
+    $("#ticker").textContent = `$${S.coin.ticker} · live on pump.fun`;
+    $("#ca").textContent = S.coin.mint ? S.coin.mint.slice(0, 6) + "…" + S.coin.mint.slice(-6) : "";
+    renderFund(); renderStatus(); renderEps(); renderVote();
+    const newest = S.episodes.find((e) => e.status === "ready");
+    if (seenReady === null) { seenReady = newest?.id || ""; playNext(); }
+    else if (newest && newest.id !== seenReady) { seenReady = newest.id; premiere(newest); }
+    else if (!playing) playNext();
+  }
+
+  const es = new EventSource("/api/events");
+  es.addEventListener("fees", (e) => {
+    const d = JSON.parse(e.data);
+    const el = document.createElement("div");
+    el.className = "fee"; el.textContent = `+${sol(d.sol)} in fees`;
+    $("#feed").appendChild(el); setTimeout(() => el.remove(), 3100);
+    refresh();
+  });
+  es.addEventListener("episode", refresh);
+  es.addEventListener("vote", (e) => { const p = JSON.parse(e.data); if (p && p.options && !p.closed) { S.poll = p; renderVote(p); } else refresh(); });
+  es.onopen = refresh;
+  setInterval(refresh, 30000);
+})();
+</script>
+</body>
+</html>
