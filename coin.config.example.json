@@ -11,6 +11,8 @@
     "night": "Every window glows with a chart. The Flats go red. The Hill stays green"
   },
   "episodeCostSol": 0.5,
+  "fundShare": 0.6,
+  "maxEpisodesPerDay": 12,
   "countExistingFees": false,
   "feeVaults": [],
   "pollSeconds": 20,

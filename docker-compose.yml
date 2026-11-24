@@ -19,9 +19,10 @@ services:
     build: ./stream
     restart: unless-stopped
     depends_on: [web]
-    env_file: .env
-    environment:
+    environment:   # only what the stream needs; no API keys in this container
       SITE_URL: http://web:3000
+      RTMP_URL: ${RTMP_URL:-}
+      STREAM_KEY: ${STREAM_KEY:-}
     volumes:
       - ./data/episodes:/out
     shm_size: "1gb"

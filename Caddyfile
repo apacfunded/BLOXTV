@@ -2,6 +2,13 @@
 # DOMAIN comes from .env (e.g. DOMAIN=bloxtv.lol).
 {$DOMAIN}, www.{$DOMAIN} {
 	encode gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
 	reverse_proxy web:3000 {
 		flush_interval -1
 	}

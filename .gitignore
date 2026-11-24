@@ -7,3 +7,4 @@ ads/build/
 *.zip
 .env.local
 .env.*.local
+__pycache__/

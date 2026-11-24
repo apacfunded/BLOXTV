@@ -24,7 +24,8 @@ for (const ep of [...getDb().episodes]) if (ep.status === "writing" || ep.status
   getDb().fund.spent -= ep.costSol;
   if (!ep.test) getDb().fund.balance += ep.costSol; // a test episode's fees were pretend, so don't start a real one with them
 }
-startFeeWatcher(addFees);
+// Only the fund's share of each creator fee counts toward the next episode (60% by default).
+startFeeWatcher((sol, meta = {}) => addFees(sol * COIN.fundShare, typeof meta === "string" ? { source: meta } : meta));
 ensurePoll();
 if (COIN.mint && process.env.PUMP_CHAT !== "0") startPumpChat(COIN.mint, onChatMessage, { onStatus: setChatStatus });
 else console.log("[chat] No mint in coin.config.json, so chat votes are off. Website votes still work.");
@@ -37,6 +38,24 @@ if (DEV && process.env.DEV_SIM_FEES === "1") setInterval(() => {
 }, 4000);
 maybeProduce();
 setInterval(tickRelease, 5_000); // the release clock (survives restarts: it's stored in the db)
+setInterval(maybeProduce, 60_000); // picks production back up after a backoff or the daily cap, without waiting for a trade
+
+// Never let one bad request or a stray async error take the whole show down mid-render.
+process.on("unhandledRejection", (err) => console.error("[unhandledRejection]", err));
+process.on("uncaughtException", (err) => console.error("[uncaughtException]", err));
+
+// The real client address. Only Caddy can reach this server, and it appends the client IP last.
+const clientIp = (req) => String(req.headers["x-forwarded-for"] || "").split(",").pop().trim() || req.socket.remoteAddress || "unknown";
+// Small in-memory rate limiter: at most `max` hits per `windowMs` per key.
+const hits = new Map();
+function limited(key, max, windowMs) {
+  const now = Date.now(), list = (hits.get(key) || []).filter((t) => now - t < windowMs);
+  list.push(now); hits.set(key, list);
+  return list.length > max;
+}
+setInterval(() => { const now = Date.now(); for (const [k, l] of hits) if (!l.some((t) => now - t < 60_000)) hits.delete(k); }, 60_000);
+const sseByIp = new Map();
+const MAX_SSE = 5000, MAX_SSE_PER_IP = 30;
 
 // Server-sent events so the site and the stream overlay update live.
 const clients = new Set();
@@ -87,10 +106,11 @@ const routes = [
     if (r.ok && fs.existsSync(epDir)) for (const d of fs.readdirSync(epDir, { withFileTypes: true })) if (d.isDirectory() && d.name !== "stream-test") fs.rmSync(path.join(path.resolve("data/episodes"), d.name), { recursive: true, force: true });
     return r.error ? [409, r] : r;
   }],
-  ["POST", /^\/api\/vote$/, (_, body) => {
-    const id = String(body.voter || "").slice(0, 40), key = String(body.key || "").toUpperCase();
-    if (!id) return [400, { error: "Missing voter id." }];
-    const poll = siteVote(id, key);
+  ["POST", /^\/api\/vote$/, (_, body, req) => {
+    // One website vote per network address (changing it replaces the old one), so a script can't stuff the vote.
+    const ip = clientIp(req), key = String(body.key || "").toUpperCase();
+    if (limited("vote:" + ip, 12, 60_000)) return [429, { error: "Too many votes from here. Wait a minute and try again." }];
+    const poll = siteVote(ip, key);
     return poll ? { poll } : [400, { error: "That option isn't open for votes." }];
   }],
   ["POST", /^\/api\/dev\/chat$/, (_, body) => {
@@ -131,19 +151,25 @@ async function readBody(req) {
 }
 
 http.createServer(async (req, res) => {
-  const url = new URL(req.url, "http://x");
   const send = (code, data, type = "application/json") => {
-    res.writeHead(code, { "content-type": type, "cache-control": "no-store" });
+    if (res.headersSent) return res.end();
+    res.writeHead(code, { "content-type": type, "cache-control": "no-store", "x-content-type-options": "nosniff", "referrer-policy": "strict-origin-when-cross-origin" });
     res.end(type === "application/json" ? JSON.stringify(data) : data);
   };
   try {
+    const url = new URL(req.url, "http://x");
+    if (req.method !== "GET" && req.method !== "HEAD" && req.method !== "POST") return send(405, { error: "Method not allowed." });
     if (url.pathname === "/api/events") {
+      const ip = clientIp(req), mine = sseByIp.get(ip) || 0;
+      if (clients.size >= MAX_SSE || mine >= MAX_SSE_PER_IP) return send(429, { error: "Too many live connections." });
+      sseByIp.set(ip, mine + 1);
       res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-store", connection: "keep-alive" });
       res.write("retry: 3000\n\n");
       clients.add(res); setViewers(clients.size);
-      req.on("close", () => { clients.delete(res); setViewers(clients.size); });
+      req.on("close", () => { clients.delete(res); const n = (sseByIp.get(ip) || 1) - 1; n > 0 ? sseByIp.set(ip, n) : sseByIp.delete(ip); setViewers(clients.size); });
       return;
     }
+    if (url.pathname.startsWith("/api/") && limited("api:" + clientIp(req), 240, 60_000)) return send(429, { error: "Slow down a little." });
     if (url.pathname.startsWith("/api/")) {
       for (const [method, re, fn] of routes) {
         const m = url.pathname.match(re);
@@ -161,9 +187,12 @@ http.createServer(async (req, res) => {
       const f = hidden ? null : episodeFile(epm[1]);
       if (!f) return send(404, "Not found", "text/plain");
       const stat = fs.statSync(f), range = req.headers.range?.match(/bytes=(\d+)-(\d*)/);
-      const start = range ? Number(range[1]) : 0, end = range && range[2] ? Number(range[2]) : stat.size - 1;
+      const start = range ? Number(range[1]) : 0, end = Math.min(stat.size - 1, range && range[2] ? Number(range[2]) : stat.size - 1);
+      if (start > end || start >= stat.size) { res.writeHead(416, { "content-range": `bytes */${stat.size}` }); return res.end(); }
       res.writeHead(range ? 206 : 200, { "content-type": "video/mp4", "accept-ranges": "bytes", "content-length": end - start + 1, ...(range ? { "content-range": `bytes ${start}-${end}/${stat.size}` } : {}) });
-      return fs.createReadStream(f, { start, end }).pipe(res);
+      const stream = fs.createReadStream(f, { start, end });
+      stream.on("error", () => res.destroy());
+      return stream.pipe(res);
     }
     const pathname = url.pathname === "/stream" ? "/stream.html" : url.pathname;
     let file = path.join(PUBLIC, path.normalize(pathname));
@@ -171,8 +200,9 @@ http.createServer(async (req, res) => {
     if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(PUBLIC, "index.html");
     send(200, fs.readFileSync(file), TYPES[path.extname(file)] || "application/octet-stream");
   } catch (err) {
-    console.error(err);
-    send(500, { error: "Something broke on our side. Try again." });
+    const bad = err instanceof SyntaxError || err?.code === "ERR_INVALID_URL" || err?.message === "too large";
+    if (!bad) console.error(err);
+    try { send(bad ? 400 : 500, { error: bad ? "That request couldn't be read." : "Something broke on our side. Try again." }); } catch { res.destroy(); }
   }
 }).listen(PORT, () => {
   console.log(`${COIN.name} ($${COIN.ticker}) → http://localhost:${PORT}`);
