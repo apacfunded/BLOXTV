@@ -103,7 +103,7 @@ Set `VIDEO_PROVIDER=higgsfield` with `HF_API_KEY_ID` and `HF_API_KEY_SECRET` fro
 | `HF_VIDEO_MODEL` | `bytedance/seedance-2.5/reference-to-video` | Clips from keyframe + cast sheet |
 | `HF_RESOLUTION` | `480p` | `480p` ≈ 3 credits/s, `720p` ≈ 7, `1080p` ≈ 16 |
 | `HF_DURATION` | per line | Seconds per clip (4–30) |
-| `HF_PARALLEL` | `4` | Scenes generated at once |
+| `HF_PARALLEL` | `2` | Scenes generated at once |
 
 Tested end to end against a stand-in of the documented API, not against the live service yet; the first real episode is the live test.
 
