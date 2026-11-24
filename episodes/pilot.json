@@ -1,0 +1,24 @@
+{
+  "title": "Candlewick — chapter 1: Tonight, one of the Whale's Bots stopped outside my window",
+  "cliffhanger": "Tonight, one of the Whale's Bots stopped outside my window. It turned its head.",
+  "nextOptions": ["Ollie goes outside to face the Bot", "Ollie hides the phone and runs to Mrs. Pearl", "Milo bangs on the door with a new coin idea"],
+  "scenes": [
+    { "line": "In my town, everyone launches memecoins. Everyone.", "setting": "the Launch Pad square at noon", "action": "a duck presses the big red button, a firework and coins shoot up, Ollie deadpan to camera", "mood": "day" },
+    { "line": "The KOLs live on the Hill. Retail lives down here, in the Flats.", "setting": "wide view of the Hill's glass towers above the flooded Flats", "action": "Ollie on a plank dock looks up at the green chart screens", "mood": "day" },
+    { "line": "My best friend Milo launched a coin this morning. It's already at zero.", "setting": "plank dock in the Flats", "action": "Milo holds out a cracked phone with a flat red line, Ollie doesn't react", "mood": "day" },
+    { "line": "I have a thing I don't talk about. When I look at a chart, the winning trade glows green.", "setting": "close on Ollie's face lit by a phone", "action": "one candle glows green and reflects in his eye", "mood": "sunset" },
+    { "line": "If the KOLs find out, I'm gone. So I lose on purpose. In public.", "setting": "town square under a giant screen with a Caller", "action": "Ollie shows a red chart, kids laugh, he shrugs", "mood": "sunset" },
+    { "line": "At night I trade alone. My wallet is bigger than the Whale's. Nobody knows.", "setting": "Ollie's dark bedroom", "action": "Ollie lifts a floorboard, a phone glows green underneath", "mood": "night" },
+    { "line": "Tonight, one of the Whale's Bots stopped outside my window. It turned its head.", "setting": "Ollie's bedroom window at night", "action": "a grey faceless Bot stands in the rain with its head turned to the window, Ollie frozen by the curtain", "mood": "night" }
+  ],
+  "keyframes": [
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_172154_6d6196e1-875e-4cb2-b5c4-65b24a298ba5.png",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_172146_53ac1818-bf52-4151-9486-704fdaaa1ede.png",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_172147_6166232a-42c7-420a-91d4-5e5ef70fe33f.png",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_172148_4f1ef39a-65f6-4dd6-a6e4-4d35def42cce.png",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_172150_ce4e4f59-6c01-4198-ae93-96967b157bf4.png",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_172147_11e3f1dd-1a47-4d0a-9e4f-d7763b840a2e.png",
+    "https://d8j0ntlcm91z4.cloudfront.net/user_3K5xdyyILiZysqAFASaQNChCHCw/hf_20261124_172148_0263bf46-a443-4aaf-8e4c-4f0a6ac06c64.png"
+  ],
+  "clips": []
+}
