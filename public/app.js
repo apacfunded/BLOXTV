@@ -71,6 +71,8 @@
     let path = location.pathname.replace(/\/+$/, "") || "/";
     if (!PAGES[path]) path = "/";
     document.querySelectorAll("#nav a, .foot-nav a").forEach((a) => a.toggleAttribute("aria-current", a.getAttribute("href") === path));
+    document.body.classList.toggle("not-home", path !== "/");
+    setMenu(false);
     if (pageKey !== path) {
       tv?.destroy(); tv = null; tvId = null; boardKey = null; listSig = "";
       pageKey = path; page = PAGES[path]; app.innerHTML = page.html(); page.mount?.();
@@ -87,16 +89,43 @@
 
   // ---------- Shared bits
   const c = () => S.coin;
+  // The two calls to action used everywhere: Buy (always first) and Launch a town.
+  function ctaPair(cls = "") {
+    const buy = c().pumpUrl
+      ? `<a class="btn btn-buy" href="${esc(c().pumpUrl)}" target="_blank" rel="noopener">Buy $${esc(c().ticker)}</a>`
+      : `<a class="btn btn-buy" aria-disabled="true" title="Opens when the coin launches">Buy $${esc(c().ticker)}${cls === "bar" ? "" : " · at launch"}</a>`;
+    return `<div class="cta-pair ${cls}">${buy}<a class="btn btn-launch" href="/launch" data-link>Launch a town</a></div>`;
+  }
+  // One card per coin on BloxTV, plus a "your town could be next" card.
+  function coinCards() {
+    const n = ready().length, { number, stage } = current();
+    const pct = stage > 0 ? 100 : Math.round(S.fund.progress * 100);
+    return `<div class="coin-card">
+        <a class="cc-main" href="/live" data-link>
+          <img src="/brand/pfp-512.jpg" alt="">
+          <span class="cc-text"><span class="cc-name">${esc(c().town)}</span><span class="cc-tick">$${esc(c().ticker)}</span></span>
+        </a>
+        <div class="cc-meta"><span>${n} episode${n === 1 ? "" : "s"}</span><span>${stage > 0 ? `making episode ${number}` : `${pct}% to episode ${number}`}</span></div>
+        <div class="mini" aria-hidden="true"><span style="width:${pct}%"></span></div>
+        ${c().pumpUrl ? `<a class="btn btn-buy btn-sm" href="${esc(c().pumpUrl)}" target="_blank" rel="noopener">Buy</a>` : `<a class="btn btn-buy btn-sm" aria-disabled="true">Buy at launch</a>`}
+      </div>
+      <a class="coin-card next" href="/launch" data-link>
+        <span class="cc-plus" aria-hidden="true">+</span>
+        <span class="cc-name">Your town could be next</span>
+        <span class="cc-meta">Launch a coin, get your own show</span>
+        <span class="btn btn-launch btn-sm">Launch a town</span>
+      </a>`;
+  }
   const buyBtn = () => c().pumpUrl ? `<a class="btn btn-accent btn-lg" href="${esc(c().pumpUrl)}" target="_blank" rel="noopener">Buy $${esc(c().ticker)} on pump.fun</a>` : `<a class="btn btn-accent btn-lg" aria-disabled="true">Buying opens at launch</a>`;
 
-  function voteHTML(big) {
-    return `<section class="panel votes" aria-labelledby="vote-h">
+  function voteHTML(big, compact = false) {
+    return `<section class="panel votes ${compact ? "compact" : ""}" aria-labelledby="vote-h">
       <div class="panel-head"><h3 id="vote-h">${big ? "What happens next?" : "Vote on the next episode"}</h3><span class="muted small" id="vote-src"></span></div>
       <blockquote class="cliff" id="vote-cliff" hidden></blockquote>
       <p class="muted small" id="vote-q"></p>
       <div class="vote-opts" id="vote-opts" role="group" aria-label="Vote options"></div>
       <p class="muted small" id="vote-foot"></p>
-      <ul class="feed vote-feed" id="vote-feed" aria-live="polite"></ul>
+      ${compact ? `<a class="more" href="/vote" data-link>How voting works →</a>` : `<ul class="feed vote-feed" id="vote-feed" aria-live="polite"></ul>`}
     </section>`;
   }
   let myVote = null; try { myVote = JSON.parse(localStorage.getItem("imt-vote") || "null"); } catch {}
@@ -114,7 +143,10 @@
         <span class="k">${o.key}</span><span class="l">${esc(o.label)}</span><span class="n">${t.counts[o.key]}</span>
         <span class="bar"><span style="width:${(t.counts[o.key] / max * 100).toFixed(0)}%"></span></span>
       </button>`).join("");
-    $("#vote-foot").textContent = (t.total ? `${t.total} vote${t.total === 1 ? "" : "s"} so far${t.leader ? `, ${t.leader.key} is winning` : ""}. ` : "No votes yet. ") + "Vote here, or type A, B or C in the pump.fun chat. The winner becomes the next episode when the fund fills.";
+    const compact = !!box.closest(".compact");
+    $("#vote-foot").textContent = compact
+      ? (t.total ? `${t.total} vote${t.total === 1 ? "" : "s"}${t.leader ? ` · ${t.leader.key} is winning` : ""}` : "No votes yet") + " · or type A, B or C in the pump.fun chat"
+      : (t.total ? `${t.total} vote${t.total === 1 ? "" : "s"} so far${t.leader ? `, ${t.leader.key} is winning` : ""}. ` : "No votes yet. ") + "Vote here, or type A, B or C in the pump.fun chat. The winner becomes the next episode when the fund fills.";
     box.querySelectorAll(".vote-opt").forEach((b) => b.onclick = async () => {
       try {
         const r = await fetch("/api/vote", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ voter: wallet, key: b.dataset.key }) });
@@ -172,8 +204,16 @@
     <section class="home wrap">
       <span class="eyebrow"><span class="dot live" aria-hidden="true"></span> <span id="home-status">On air</span></span>
       <h1>In my town, <em>every coin</em> gets its own show.</h1>
-      <p class="lede">Every trade on <strong>$${esc(c().ticker)}</strong> pays a creator fee. The fees buy the next <strong>“In my town…”</strong> episode. You vote on what happens, and it premieres live on pump.fun.</p>
-      <div class="home-cta">${buyBtn()}<a class="btn btn-lg" href="/vote" data-link>Vote on the story</a></div>
+      <p class="lede">Buy <strong>$${esc(c().ticker)}</strong>, vote in the pump.fun chat, watch the episode your fees paid for.</p>
+      ${ctaPair("hero")}
+      <ol class="steps3">
+        <li><a href="${c().pumpUrl ? esc(c().pumpUrl) : "/how"}" ${c().pumpUrl ? 'target="_blank" rel="noopener"' : "data-link"}><span class="n" aria-hidden="true">1</span><b>Buy $${esc(c().ticker)}</b><span>Every trade fills the episode fund</span></a></li>
+        <li><a href="/vote" data-link><span class="n" aria-hidden="true">2</span><b>Vote A, B or C</b><span>in the pump.fun chat or here</span></a></li>
+        <li><a href="/live" data-link><span class="n" aria-hidden="true">3</span><b>Watch it premiere</b><span>live on the stream</span></a></li>
+      </ol>
+
+      <div class="coins-head"><h2>Coins on BloxTV</h2><a href="/towns" data-link>See all →</a></div>
+      <div class="coin-row" id="coin-row"></div>
 
       <div class="tv-wrap"><div class="tv on-air" aria-label="BloxTV">
         <div class="screen" id="screen"></div>
@@ -186,20 +226,7 @@
         <div class="channels" id="channels" role="group" aria-label="What to play"></div>
       </div>
 
-      <div class="home-vote">${voteHTML(true)}</div>
-
-      <div class="home-grid">
-        <a class="tile" href="/live" data-link><span class="k">Live</span><h3>Watch it get made</h3><p>Fees landing, the script typing itself, the render bar moving.</p></a>
-        <a class="tile" href="/episodes" data-link><span class="k">Episodes</span><h3 id="tile-eps">The story so far</h3><p>Every season's episodes, in order, with their cliffhangers.</p></a>
-        <a class="tile" href="/how" data-link><span class="k">How it works</span><h3>Fees pay for the show</h3><p>60% of every creator fee goes into the episode fund.</p></a>
-      </div>
-
-      <div class="launch-tease">
-        <span class="soon">Coming next</span>
-        <h2>Launch your own town</h2>
-        <p>After $${esc(c().ticker)}, any coin can get its own show. Same deal: no launch fee, fees pay for the episodes, viewers vote on the story.</p>
-        <a class="btn btn-lg" href="/launch" data-link>How launching works</a>
-      </div>
+      <div class="home-vote">${voteHTML(true, true)}</div>
     </section>`;
   home.update = () => {
     const { ep, number, stage } = current();
@@ -213,7 +240,7 @@
     document.querySelectorAll("[data-chan]").forEach((b) => b.onclick = () => { tvMode = b.dataset.chan; tvId = null; mountTV($("#screen")); home.update(); });
     const f = S.fund, p = stage === 0 ? f.progress : stage === 2 ? (ep.renderProgress || 0) : 1;
     $("#tv-bar").style.width = (p * 100).toFixed(1) + "%";
-    $("#tile-eps").textContent = ready().length ? `${ready().length} episode${ready().length === 1 ? "" : "s"} so far` : "The story so far";
+    $("#coin-row").innerHTML = coinCards();
     renderVote(S.poll);
   };
 
@@ -462,13 +489,7 @@
       <dl class="stats" aria-label="Totals">
         <div><dt>Towns</dt><dd>1</dd></div><div><dt>Episodes made</dt><dd id="s-episodes">0</dd></div><div><dt>Fees spent on video</dt><dd id="s-spent">0</dd></div><div><dt>Votes cast</dt><dd id="s-votes">0</dd></div>
       </dl>
-      <section class="card">
-        <ul class="towns"><li><a class="town-row" href="/live" data-link>
-          <img src="/brand/pfp-512.jpg" alt="">
-          <div><div class="t-name">${esc(c().town)} <span class="muted">· $${esc(c().ticker)}</span></div><div class="t-meta">“In my town, ${esc(lower(c().facts.weird))}.”</div></div>
-          <div class="t-right"><b id="t-eps">0 episodes</b><span id="t-fund"></span></div>
-        </a></li></ul>
-      </section>
+      <div class="coin-grid" id="coin-grid"></div>
       <section class="card section">
         <span class="eyebrow">Creator fees</span>
         <h2 style="margin-top:10px">Every trade feeds the show.</h2>
@@ -476,19 +497,12 @@
         <div class="split" aria-hidden="true"><div class="s1"><b>60%</b>Episode fund</div><div class="s2"><b>20%</b>Creator</div><div class="s3"><b>20%</b>Platform</div></div>
         <div class="split-notes"><div><b>60% makes episodes.</b> Each time the fund reaches ${sol(S.fund.cost)}, the next episode is written, rendered and premiered on stream.</div><div><b>20% to the creator.</b> Paid out like any pump.fun coin.</div><div><b>20% runs the platform.</b> Hosting, the stream and the video credits.</div></div>
       </section>
-      <div class="launch-tease" style="text-align:center">
-        <span class="soon">Coming next</span>
-        <h2>Your town could be next</h2>
-        <p>Launching other towns opens after $${esc(c().ticker)}. No launch fee. Fees pay for the episodes. Viewers vote on the story.</p>
-        <a class="btn btn-lg" href="/launch" data-link>How launching works</a>
-      </div>
     </section>`;
   towns.update = () => {
     const { number, stage } = current(), n = ready().length;
     $("#s-episodes").textContent = n; $("#s-spent").textContent = S.fund.spent.toFixed(2);
     $("#s-votes").textContent = (S.poll?.voters || 0) + (S.lastPoll?.voters || 0);
-    $("#t-eps").textContent = `${n} episode${n === 1 ? "" : "s"}`;
-    $("#t-fund").textContent = stage > 0 ? "making episode " + number : `fund ${Math.round(S.fund.progress * 100)}%`;
+    $("#coin-grid").innerHTML = coinCards();
   };
 
   // ---------- Page: How it works
@@ -577,10 +591,21 @@
 
   // ---------- Header + data
   const setViewers = (n) => { $("#viewers").innerHTML = `<b>${n}</b><span class="vw"> watching</span>`; };
+  // Phone menu
+  function setMenu(open) {
+    const btn = $("#menu-btn"); if (!btn) return;
+    btn.setAttribute("aria-expanded", String(open)); btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    document.body.classList.toggle("menu-open", open);
+  }
+  $("#menu-btn")?.addEventListener("click", () => setMenu(!document.body.classList.contains("menu-open")));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
+
   function header() {
     $("#brand-name").textContent = c().name;
     const buy = $("#buy"); buy.textContent = `Buy $${c().ticker}`;
     if (c().pumpUrl) buy.href = c().pumpUrl; else buy.setAttribute("aria-disabled", "true");
+    $("#end-cta").innerHTML = `<div class="wrap"><h2>Get in on the show</h2><p>Buy $${esc(c().ticker)} to fund the next episode, or launch your own town.</p>${ctaPair("big")}</div>`;
+    $("#mobile-bar").innerHTML = ctaPair("bar");
     for (const id of ["x-link", "x-foot"]) { const a = $("#" + id); if (a && c().links?.x) { a.href = c().links.x; a.hidden = false; } }
     document.documentElement.style.setProperty("--c", c().color);
   }
