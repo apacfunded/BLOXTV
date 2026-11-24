@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { COIN } from "./lib/config.js";
 import { load, getDb } from "./lib/store.js";
-import { state, addFees, subscribe, completeEpisode, maybeProduce, renderProgress, setViewers, onChatMessage, siteVote, setChatStatus, startTestEpisode, clearPreviewEpisodes, resetShow } from "./lib/show.js";
+import { state, addFees, subscribe, completeEpisode, maybeProduce, renderProgress, setViewers, onChatMessage, siteVote, setChatStatus, startTestEpisode, clearPreviewEpisodes, resetShow, importEpisode } from "./lib/show.js";
 import { ensurePoll } from "./lib/votes.js";
 import { startPumpChat } from "./lib/pumpchat.js";
 import { episodeFile } from "./lib/assemble.js";
@@ -59,6 +59,13 @@ const routes = [
     const ip = req.socket.remoteAddress || "";
     if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(ip)) return [403, { error: "Admin routes only work from inside the server." }];
     const r = clearPreviewEpisodes();
+    return r.error ? [409, r] : r;
+  }],
+  // Admin: import an episode made elsewhere (clips as URLs). Localhost only.
+  ["POST", /^\/api\/admin\/import-episode$/, async (_, body, req) => {
+    const ip = req.socket.remoteAddress || "";
+    if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(ip)) return [403, { error: "Admin routes only work from inside the server." }];
+    const r = await importEpisode(body);
     return r.error ? [409, r] : r;
   }],
   // Admin: wipe episodes, votes and the fund for a clean launch. Localhost only.
