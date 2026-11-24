@@ -5,6 +5,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
       chromium xvfb pulseaudio ffmpeg fonts-liberation fonts-noto-color-emoji ca-certificates curl procps \
     && rm -rf /var/lib/apt/lists/*
+# pump.fun's "stream with external software" hands out a WHIP (WebRTC) address, which needs ffmpeg 8+.
+# Debian's ffmpeg is too old for that, so a current static build goes in front of it on the PATH.
+RUN curl -fsSL -o /tmp/ff.tar.xz https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz \
+    && mkdir -p /tmp/ff && tar -xJf /tmp/ff.tar.xz -C /tmp/ff --strip-components=1 \
+    && install -m 755 /tmp/ff/bin/ffmpeg /usr/local/bin/ffmpeg && rm -rf /tmp/ff /tmp/ff.tar.xz \
+    && ffmpeg -hide_banner -muxers 2>/dev/null | grep -q whip
 RUN useradd -m streamer
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

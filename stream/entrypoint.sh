@@ -58,12 +58,30 @@ if [ -n "$SELFTEST" ]; then
   exit $code
 fi
 
+# pump.fun gives either an rtmp:// address + key, or (external software / OBS) a WHIP https:// address + key.
+# WHIP wants H.264 baseline without B-frames and 48 kHz stereo Opus; the key travels as a Bearer token.
+whip_encoder() {
+  ffmpeg -hide_banner -loglevel warning \
+    -probesize 20M -f x11grab -framerate "$FPS" -video_size "${W}x${H}" -draw_mouse 0 -thread_queue_size 1024 -i :99 \
+    "${AUDIO_IN[@]}" \
+    -c:v libx264 -preset "${PRESET:-ultrafast}" -tune zerolatency -profile:v baseline -bf 0 -threads 0 -pix_fmt yuv420p \
+    -g "$((FPS * 2))" -keyint_min "$FPS" \
+    -b:v "${VIDEO_BITRATE:-4500k}" -maxrate "${VIDEO_BITRATE:-4500k}" -bufsize "$((2 * ${VIDEO_BITRATE%k}))k" \
+    -c:a libopus -b:a "${AUDIO_BITRATE:-160k}" -ar 48000 -ac 2 \
+    -f whip -authorization "$STREAM_KEY" "$@"
+}
 while true; do
   log "starting browser"
   browser & BPID=$!
   sleep 6
-  log "starting encoder -> ${RTMP_URL%/}/********"
-  encoder -f flv "${RTMP_URL%/}/${STREAM_KEY}"; code=$?
+  case "$RTMP_URL" in
+    http://*|https://*)
+      log "starting WHIP encoder -> ${RTMP_URL%/} (key sent as bearer token)"
+      whip_encoder "${RTMP_URL%/}"; code=$? ;;
+    *)
+      log "starting RTMP encoder -> ${RTMP_URL%/}/********"
+      encoder -f flv "${RTMP_URL%/}/${STREAM_KEY}"; code=$? ;;
+  esac
   log "encoder exited ($code), restarting in 5s"
   kill "$BPID" 2>/dev/null; wait "$BPID" 2>/dev/null
   sleep 5
